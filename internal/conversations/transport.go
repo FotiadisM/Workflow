@@ -1,4 +1,4 @@
-package conversation
+package conversations
 
 type getConversationsRequest struct{}
 type getConversationsResponse struct{}
