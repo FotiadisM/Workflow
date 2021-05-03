@@ -2,6 +2,7 @@ package auth
 
 import (
 	"context"
+	"encoding/json"
 	"net/http"
 
 	httptransport "github.com/go-kit/kit/transport/http"
@@ -26,9 +27,15 @@ func NewHTTPRouter(e Endpoints, r *mux.Router, options ...httptransport.ServerOp
 }
 
 func decodeSignInRequest(ctx context.Context, r *http.Request) (request interface{}, err error) {
-	return
+	var res signInRequest
+	err = json.NewDecoder(r.Body).Decode(&res)
+
+	return res, err
 }
 
 func decodeSignUpRequest(ctx context.Context, r *http.Request) (request interface{}, err error) {
-	return
+	var res signUpRequest
+	err = json.NewDecoder(r.Body).Decode(&res)
+
+	return res, err
 }

@@ -16,3 +16,6 @@ type User struct {
 	Position string `json:"position"`
 	Role     Role   `json:"role"`
 }
+
+type Repository interface {
+}

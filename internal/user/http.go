@@ -8,7 +8,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func NewHTTPHandler(e Endpoints, r mux.Router, options ...httptransport.ServerOption) {
+func NewHTTPHandler(e Endpoints, r *mux.Router, options ...httptransport.ServerOption) {
 
 	r.Methods("GET").Path("/").Handler(httptransport.NewServer(
 		e.getUserEndpoint,

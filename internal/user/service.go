@@ -11,10 +11,11 @@ type Service interface {
 }
 
 type service struct {
+	repo Repository
 }
 
-func NewService() Service {
-	return service{}
+func NewService(r Repository) Service {
+	return service{r}
 }
 
 func (s service) getUser(ctx context.Context, req getUserRequest) (res getUserResponse, err error) {
