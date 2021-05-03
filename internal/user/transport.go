@@ -1,13 +1,22 @@
 package user
 
-type NewUserRequest struct{}
-type NewUserResponse struct{}
-
-type GetUserRequest struct {
+type getUserRequest struct {
 	ID string `json:"id"`
 }
 
-type GetUserResponse struct {
+type getUserResponse struct {
 	User  User  `json:"user"`
 	Error error `json:"error"`
 }
+
+type getPerpetatorRequest struct{}
+type getPerpetatorResponse struct{}
+
+type getConnectionsRequest struct{}
+type getConnectionsResponse struct{}
+
+type postConnectionRequest struct{}
+type postConnectionResponse struct{}
+
+type changeConnectionRequest struct{}
+type changeConnectionResponse struct{}

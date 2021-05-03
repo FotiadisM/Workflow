@@ -8,37 +8,56 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func NewHTTPHandler(endpoints Endpoints, options ...httptransport.ServerOption) http.Handler {
+func NewHTTPHandler(e Endpoints, r mux.Router, options ...httptransport.ServerOption) {
 
-	m := mux.NewRouter()
-
-	m.Methods("GET").Path("/user/{id}").Handler(httptransport.NewServer(
-		endpoints.GetUserEndpoint,
+	r.Methods("GET").Path("/").Handler(httptransport.NewServer(
+		e.getUserEndpoint,
 		decodeGetUserRequest,
 		httptransport.EncodeJSONResponse,
 		options...,
 	))
 
-	m.Methods("POST").Path("/user").Handler(httptransport.NewServer(
-		endpoints.NewUserEndpoint,
-		decodeNewUserRequest,
+	r.Methods("GET").Path("/perpetator").Handler(httptransport.NewServer(
+		e.getPerpetatorEndpoint,
+		decodeGetPerpetatorRequest,
 		httptransport.EncodeJSONResponse,
 		options...,
 	))
 
-	return m
+	r.Methods("GET").Path("/connections").Handler(httptransport.NewServer(
+		e.getConnectionsEndpoint,
+		decodeGetConnectionsRequest,
+		httptransport.EncodeJSONResponse,
+		options...,
+	))
+
+	r.Methods("POST").Path("/connections").Handler(httptransport.NewServer(
+		e.postConnectionEndpoint,
+		decodePostConnectionRequest,
+		httptransport.EncodeJSONResponse,
+		options...,
+	))
+
+	r.Methods("PUT").Path("/connections").Handler(httptransport.NewServer(
+		e.changeConnectionEndpoint,
+		decodeChangeConnectionRequest,
+		httptransport.EncodeJSONResponse,
+		options...,
+	))
 }
 
-func decodeNewUserRequest(_ context.Context, r *http.Request) (request interface{}, err error) {
+func decodeGetUserRequest(ctx context.Context, r *http.Request) (request interface{}, err error) {
 	return
 }
-
-func decodeGetUserRequest(_ context.Context, r *http.Request) (request interface{}, err error) {
-	vars := mux.Vars(r)
-
-	id := vars["id"]
-
-	req := GetUserRequest{id}
-
-	return req, nil
+func decodeGetPerpetatorRequest(ctx context.Context, r *http.Request) (request interface{}, err error) {
+	return
+}
+func decodeGetConnectionsRequest(ctx context.Context, r *http.Request) (request interface{}, err error) {
+	return
+}
+func decodePostConnectionRequest(ctx context.Context, r *http.Request) (request interface{}, err error) {
+	return
+}
+func decodeChangeConnectionRequest(ctx context.Context, r *http.Request) (request interface{}, err error) {
+	return
 }

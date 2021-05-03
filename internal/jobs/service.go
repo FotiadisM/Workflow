@@ -19,6 +19,7 @@ func NewService(r Repository) Service {
 }
 
 func (s service) getJobs(ctx context.Context, req getJobsRequest) (res getJobsResponse, err error) {
+	res.Name = "test worked!"
 	return
 }
 

@@ -1,7 +1,9 @@
 package jobs
 
 type getJobsRequest struct{}
-type getJobsResponse struct{}
+type getJobsResponse struct {
+	Name string `json:"name"`
+}
 
 type postJobRequest struct{}
 type postJobResponse struct{}

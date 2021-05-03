@@ -16,7 +16,6 @@ type Endpoints struct {
 }
 
 func NewEndpoints(s Service) Endpoints {
-
 	return Endpoints{
 		makeGetPostEndpoint(s),
 		makePostPostEndpoint(s),

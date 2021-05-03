@@ -9,8 +9,8 @@ type Service interface {
 	getComments(ctx context.Context, req getCommentsRequest) (res getCommentsResponse, err error)
 	postComment(ctx context.Context, req postCommentRequest) (res postCommentResponse, err error)
 
-	likePost(ctx context.Context, req likePostRequest) (res likePostRequest, err error)
-	likeComment(ctx context.Context, req likeCommentRequest) (res likeCommentRequest, err error)
+	likePost(ctx context.Context, req likePostRequest) (res likePostResponse, err error)
+	likeComment(ctx context.Context, req likeCommentRequest) (res likeCommentResponse, err error)
 }
 
 type service struct {
@@ -37,10 +37,10 @@ func (s service) postComment(ctx context.Context, req postCommentRequest) (res p
 	return
 }
 
-func (s service) likePost(ctx context.Context, req likePostRequest) (res likePostRequest, err error) {
+func (s service) likePost(ctx context.Context, req likePostRequest) (res likePostResponse, err error) {
 	return
 }
 
-func (s service) likeComment(ctx context.Context, req likeCommentRequest) (res likeCommentRequest, err error) {
+func (s service) likeComment(ctx context.Context, req likeCommentRequest) (res likeCommentResponse, err error) {
 	return
 }

@@ -1,28 +1,38 @@
 package user
 
-import (
-	"context"
-	"fmt"
-)
+import "context"
 
-type Service struct {
+type Service interface {
+	getUser(ctx context.Context, req getUserRequest) (res getUserResponse, err error)
+	getPerpetator(ctx context.Context, req getPerpetatorRequest) (res getPerpetatorResponse, err error)
+	getConnections(ctx context.Context, req getConnectionsRequest) (res getConnectionsResponse, err error)
+	postConnection(ctx context.Context, req postConnectionRequest) (res postConnectionResponse, err error)
+	changeConnection(ctx context.Context, req changeConnectionRequest) (res changeConnectionResponse, err error)
+}
+
+type service struct {
 }
 
 func NewService() Service {
-	return Service{}
+	return service{}
 }
 
-func (s Service) NewUser(ctx context.Context, req NewUserRequest) (res NewUserResponse, err error) {
-
+func (s service) getUser(ctx context.Context, req getUserRequest) (res getUserResponse, err error) {
 	return
 }
 
-func (s Service) GetUser(ctx context.Context, req GetUserRequest) (res GetUserResponse, err error) {
+func (s service) getPerpetator(ctx context.Context, req getPerpetatorRequest) (res getPerpetatorResponse, err error) {
+	return
+}
 
-	fmt.Println(req.ID)
+func (s service) getConnections(ctx context.Context, req getConnectionsRequest) (res getConnectionsResponse, err error) {
+	return
+}
 
-	res.User.FName = "mike"
-	res.User.LName = "fotiadis"
+func (s service) postConnection(ctx context.Context, req postConnectionRequest) (res postConnectionResponse, err error) {
+	return
+}
 
+func (s service) changeConnection(ctx context.Context, req changeConnectionRequest) (res changeConnectionResponse, err error) {
 	return
 }
