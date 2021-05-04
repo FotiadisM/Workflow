@@ -2,6 +2,7 @@ package auth
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/go-kit/kit/endpoint"
 )
@@ -33,5 +34,30 @@ func makeSignUpEndpoint(s Service) endpoint.Endpoint {
 		res, err := s.signUp(ctx, req)
 
 		return res, err
+	}
+}
+
+func (e *Endpoints) WrapAllExcept(middleware endpoint.Middleware, excluded ...string) {
+	included := map[string]struct{}{
+		"signIn": {},
+		"signUp": {},
+	}
+
+	for _, ex := range excluded {
+		if _, ok := included[ex]; !ok {
+			panic(fmt.Sprintf("Excluded endpoint '%s' does not exist", ex))
+		}
+		delete(included, ex)
+	}
+
+	for inc := range included {
+		switch inc {
+		case "signIn":
+			e.signInEndpoint = middleware(e.signInEndpoint)
+		case "signUp":
+			e.signUpEndpoint = middleware(e.signUpEndpoint)
+		default:
+			panic(fmt.Sprintf("Endpoint '%s' is missing", inc))
+		}
 	}
 }
