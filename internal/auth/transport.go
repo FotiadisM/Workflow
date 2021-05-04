@@ -15,6 +15,7 @@ type signInResponse struct {
 		Email    string `json:"email"`
 		Company  string `json:"company"`
 		Position string `json:"position"`
+		Role     string `json:"role"`
 	} `json:"user"`
 }
 
@@ -35,5 +36,6 @@ type signUpResponse struct {
 		Email    string `json:"email"`
 		Company  string `json:"company"`
 		Position string `json:"position"`
+		Role     string `json:"role"`
 	} `json:"user"`
 }

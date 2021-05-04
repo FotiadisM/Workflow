@@ -2,7 +2,9 @@ package auth
 
 import (
 	"context"
+	"strings"
 
+	"github.com/FotiadisM/workflow-server/internal/user"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -40,6 +42,7 @@ func (s service) signIn(ctx context.Context, req signInRequest) (res signInRespo
 	res.User.Email = u.Email
 	res.User.Company = u.Company
 	res.User.Position = u.Position
+	res.User.Role = string(u.Role)
 
 	return
 }
@@ -50,20 +53,20 @@ func (s service) signUp(ctx context.Context, req signUpRequest) (res signUpRespo
 		return
 	}
 
-	err = s.repo.CreateUserCredentials(ctx, req.Email, string(hashedPassword))
-	if err != nil {
-		return
-	}
-
-	id, err := s.repo.CreateUser(ctx, req.FName, req.LName, req.Email)
+	fName := strings.Title(req.FName)
+	lName := strings.Title(req.LName)
+	id, err := s.repo.CreateUser(ctx, fName, lName, req.Email, string(hashedPassword))
 	if err != nil {
 		return
 	}
 
 	res.User.ID = id
-	res.User.FName = req.FName
-	res.User.LName = req.LName
+	res.User.FName = fName
+	res.User.LName = lName
 	res.User.Email = req.Email
+	res.User.Company = "-"
+	res.User.Position = "-"
+	res.User.Role = string(user.Normal)
 
 	return
 }

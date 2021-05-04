@@ -19,7 +19,7 @@ func NewHTTPRouter(e Endpoints, r *mux.Router, options ...httptransport.ServerOp
 	))
 
 	r.Methods("POST").Path("/signUp").Handler(httptransport.NewServer(
-		e.signInEndpoint,
+		e.signUpEndpoint,
 		decodeSignUpRequest,
 		httptransport.EncodeJSONResponse,
 		options...,

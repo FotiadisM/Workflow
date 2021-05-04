@@ -1,10 +1,10 @@
 package user
 
-type Role int
+type Role string
 
 const (
-	Admin Role = iota
-	Normal
+	Admin  Role = "admin"
+	Normal Role = "normal"
 )
 
 type User struct {
