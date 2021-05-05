@@ -1,10 +1,9 @@
-package httpHelper
+package httpError
 
 import (
 	"context"
 	"encoding/json"
 	"net/http"
-	"strings"
 
 	httptransport "github.com/go-kit/kit/transport/http"
 )
@@ -15,9 +14,6 @@ const (
 
 	CtxTransport = "transport"
 )
-
-// ctxKey type definision for passing context values
-type ctxKey string
 
 // HTTPError satisfies the Headerer and StatusCoder interfaces in
 // package kit/transport/http.
@@ -70,19 +66,4 @@ func ErrorEncoder(_ context.Context, err error, w http.ResponseWriter) {
 
 	w.WriteHeader(code)
 	w.Write(body)
-}
-
-func HeadersToContext(ctx context.Context, r *http.Request) context.Context {
-	ctx = context.WithValue(ctx, ctxKey(CtxTransport), "HTTP")
-
-	for k := range r.Header {
-		// The key is added both in http format (k) which has had
-		// http.CanonicalHeaderKey called on it in transport as well as the
-		// strings.ToLower which is the grpc metadata format of the key so
-		// that it can be accessed in either format
-		ctx = context.WithValue(ctx, ctxKey(k), r.Header.Get(k))
-		ctx = context.WithValue(ctx, ctxKey(strings.ToLower(k)), r.Header.Get(k))
-	}
-
-	return ctx
 }

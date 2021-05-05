@@ -86,5 +86,27 @@ func (r Repository) initDatabase(ctx context.Context) (err error) {
 		return
 	}
 
+	_, err = r.db.Exec(ctx, `CREATE TABLE IF NOT EXISTS conversations (
+		id UUID UNIQUE DEFAULT gen_random_uuid(),
+		user1_id UUID REFERENCES public.users(id),
+		user2_id UUID REFERENCES public.users(id),
+	  
+		CONSTRAINT "primary" PRIMARY KEY (user1_id, user2_id)
+	  );`)
+	if err != nil {
+		return
+	}
+
+	_, err = r.db.Exec(ctx, `CREATE TABLE IF NOT EXISTS messages (
+		id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+		conv_id UUID REFERENCES public.conversations(id),
+		senter_id UUID REFERENCES public.users(id),
+		text STRING NOT NULL,
+		time_sent TIMESTAMP DEFAULT now()
+	  );`)
+	if err != nil {
+		return
+	}
+
 	return
 }

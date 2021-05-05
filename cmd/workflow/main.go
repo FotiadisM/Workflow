@@ -66,19 +66,19 @@ func main() {
 		authEnds.WrapAllExcept(middleware.Logger(logger))
 		auth.NewHTTPRouter(authEnds, r.PathPrefix("/auth").Subrouter(), options...)
 
-		userSvc := user.NewService(nil)
+		userSvc := user.NewService(repo)
 		userEnds := user.NewEndpoints(userSvc)
 		user.NewHTTPHandler(userEnds, r.PathPrefix("/users").Subrouter(), options...)
 
-		postsSvc := posts.NewService(nil)
+		postsSvc := posts.NewService(repo)
 		postsEnds := posts.NewEndpoints(postsSvc)
 		posts.NewHTTPRouter(postsEnds, r.PathPrefix("/posts").Subrouter(), options...)
 
-		convSvc := conversations.NewService(nil)
+		convSvc := conversations.NewService(repo)
 		convEnds := conversations.NewEndpoints(convSvc)
 		conversations.NewHTTPRouter(convEnds, r.PathPrefix("/conversations").Subrouter(), options...)
 
-		jobsSvc := jobs.NewService(nil)
+		jobsSvc := jobs.NewService(repo)
 		jobEnds := jobs.NewEndpoints(jobsSvc)
 		jobs.NewHTTPRouter(jobEnds, r.PathPrefix("/jobs").Subrouter(), options...)
 	}

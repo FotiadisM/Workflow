@@ -22,8 +22,8 @@ type User struct {
 }
 
 type Connection struct {
-	ConnID string
-	UserID string
+	ConnID string `json:"conn_id"`
+	UserID string `json:"user_id"`
 }
 
 type Repository interface {
