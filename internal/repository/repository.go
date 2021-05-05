@@ -42,7 +42,10 @@ func NewRepository(ctx context.Context, dbURL string) (r Repository, err error) 
 }
 
 func (r Repository) initDatabase(ctx context.Context) (err error) {
-	_, err = r.db.Exec(ctx, "CREATE TABLE IF NOT EXISTS auth (email STRING(90) PRIMARY KEY, password STRING NOT NULL);")
+	_, err = r.db.Exec(ctx, `CREATE TABLE IF NOT EXISTS auth (
+		email STRING(90) PRIMARY KEY,
+		password STRING NOT NULL
+	);`)
 	if err != nil {
 		return
 	}
@@ -55,7 +58,30 @@ func (r Repository) initDatabase(ctx context.Context) (err error) {
 		company STRING(60) NOT NULL,
 		position STRING(60) NOT NULL,
 		role STRING(60) NOT NULL
-	  );`)
+	);`)
+	if err != nil {
+		return
+	}
+
+	// connections
+	_, err = r.db.Exec(ctx, `CREATE TABLE IF NOT EXISTS connections (
+		id UUID UNIQUE,
+		user1_id UUID REFERENCES public.users(id),
+		user2_id UUID REFERENCES public.users(id),
+	  
+		CONSTRAINT "primary" PRIMARY KEY (user1_id, user2_id)
+	);`)
+	if err != nil {
+		return
+	}
+
+	_, err = r.db.Exec(ctx, `CREATE TABLE IF NOT EXISTS connection_requests (
+		id UUID UNIQUE DEFAULT gen_random_uuid(),
+		user1_id UUID REFERENCES public.users(id),
+		user2_id UUID REFERENCES public.users(id),
+	  
+		CONSTRAINT "primary" PRIMARY KEY (user1_id, user2_id)
+	);`)
 	if err != nil {
 		return
 	}

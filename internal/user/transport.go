@@ -1,22 +1,50 @@
 package user
 
 type getUserRequest struct {
-	ID string `json:"id"`
+	UserID string `json:"user_id"`
 }
-
 type getUserResponse struct {
-	User  User  `json:"user"`
-	Error error `json:"error"`
+	User User  `json:"user"`
+	Err  error `json:"err,omitempty"`
 }
 
-type getPerpetatorRequest struct{}
-type getPerpetatorResponse struct{}
+type getPerpetatorRequest struct {
+	PerpID string `json:"perp_id"`
+}
+type getPerpetatorResponse struct {
+	FName    string `json:"f_name"`
+	LName    string `json:"l_name"`
+	Company  string `json:"company"`
+	Position string `json:"position"`
+	Err      error  `json:"err,omitempty"`
+}
 
-type getConnectionsRequest struct{}
-type getConnectionsResponse struct{}
+type getConnectionsRequest struct {
+	UserID string
+}
+type getConnectionsResponse struct {
+	Connections []struct {
+		ConnID string `json:"conn_id"`
+		UserID string `json:"user_id"`
+	} `json:"connections"`
+	Err error `json:"err,omitempty"`
+}
 
-type postConnectionRequest struct{}
-type postConnectionResponse struct{}
+type postConnectionRequest struct {
+	UserID  string `json:"user_id"`
+	User2ID string `json:"user_2_id"`
+}
+type postConnectionResponse struct {
+	ConnID string `json:"conn_id"`
+	Err    error  `json:"err,omitempty"`
+}
 
-type changeConnectionRequest struct{}
-type changeConnectionResponse struct{}
+type changeConnectionRequest struct {
+	UserID string `json:"user_id"`
+	ConnID string `json:"conn_id"`
+	Accept bool   `json:"accept"`
+	Err    error  `json:"err,omitempty"`
+}
+type changeConnectionResponse struct {
+	Err error `json:"err,omitempty"`
+}

@@ -31,7 +31,7 @@ func (s service) signIn(ctx context.Context, req signInRequest) (res signInRespo
 		return
 	}
 
-	u, err := s.repo.GetUser(ctx, req.Email)
+	u, err := s.repo.GetUserByEmail(ctx, req.Email)
 	if err != nil {
 		return
 	}
@@ -42,7 +42,7 @@ func (s service) signIn(ctx context.Context, req signInRequest) (res signInRespo
 	res.User.Email = u.Email
 	res.User.Company = u.Company
 	res.User.Position = u.Position
-	res.User.Role = string(u.Role)
+	res.User.Role = u.Role
 
 	return
 }
@@ -66,7 +66,7 @@ func (s service) signUp(ctx context.Context, req signUpRequest) (res signUpRespo
 	res.User.Email = req.Email
 	res.User.Company = "-"
 	res.User.Position = "-"
-	res.User.Role = string(user.Normal)
+	res.User.Role = user.Normal
 
 	return
 }

@@ -8,6 +8,6 @@ import (
 
 type Repository interface {
 	GetUserPassword(ctx context.Context, email string) (password string, err error)
-	CreateUser(ctx context.Context, fName string, lName string, email string, password string) (id string, err error)
-	GetUser(ctx context.Context, email string) (u user.User, err error)
+	CreateUser(ctx context.Context, fName, lName, email, password string) (id string, err error)
+	GetUserByEmail(ctx context.Context, email string) (u user.User, err error)
 }
