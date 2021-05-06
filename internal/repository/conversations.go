@@ -2,12 +2,13 @@ package repository
 
 import (
 	"context"
+	"time"
 
 	"github.com/FotiadisM/workflow-server/internal/conversations"
 )
 
 func (r Repository) GetConversations(ctx context.Context, userID string) (convs []conversations.Conversation, err error) {
-	rows, err := r.db.Query(ctx, `SELECT * FORM conversations WHERE user1_id=$1 OR user2_id=$1`, userID)
+	rows, err := r.db.Query(ctx, `SELECT * FROM conversations WHERE user1_id=$1 OR user2_id=$1`, userID)
 	if err != nil {
 		return
 	}
@@ -21,9 +22,9 @@ func (r Repository) GetConversations(ctx context.Context, userID string) (convs 
 
 		switch userID {
 		case user1ID:
-			convs = append(convs, conversations.Conversation{ID: id, ConvUserID: user1ID})
-		case user2ID:
 			convs = append(convs, conversations.Conversation{ID: id, ConvUserID: user2ID})
+		case user2ID:
+			convs = append(convs, conversations.Conversation{ID: id, ConvUserID: user1ID})
 		}
 	}
 
@@ -36,7 +37,7 @@ func (r Repository) CreateConversation(ctx context.Context, userID, convUserID s
 }
 
 func (r Repository) GetConversationMessages(ctx context.Context, convID string) (msgs []conversations.Message, err error) {
-	rows, err := r.db.Query(ctx, `SELECT * FORM messages WHERE conv_id=$1`, convID)
+	rows, err := r.db.Query(ctx, `SELECT * FROM messages WHERE conv_id=$1`, convID)
 	if err != nil {
 		return
 	}
@@ -53,7 +54,7 @@ func (r Repository) GetConversationMessages(ctx context.Context, convID string) 
 	return
 }
 
-func (r Repository) CreateConversationMessage(ctx context.Context, convID, senterID, text string) (msgID string, timeSent string, err error) {
+func (r Repository) CreateConversationMessage(ctx context.Context, convID, senterID, text string) (msgID string, timeSent time.Time, err error) {
 	err = r.db.QueryRow(ctx, `INSERT INTO messages (conv_id, senter_id, text) VALUES ($1, $2, $3) RETURNING id, time_sent`, convID, senterID, text).Scan(&msgID, &timeSent)
 
 	return

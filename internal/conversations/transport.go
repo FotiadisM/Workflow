@@ -4,13 +4,13 @@ type getConversationsRequest struct {
 	UserID string `json:"user_id"`
 }
 type getConversationsResponse struct {
-	Conversations []Conversation `json:"conversations,omitempty"`
+	Conversations []Conversation `json:"conversations"`
 	Err           error          `json:"err,omitempty"`
 }
 
 type postConversationsRequest struct {
-	User1ID string `json:"user_1_id"`
-	User2ID string `json:"user_2_id"`
+	UserID     string `json:"user_id"`
+	ConvUserID string `json:"conv_user_id"`
 }
 type postConversationsResponse struct {
 	ConvID string `json:"conv_id,omitempty"`
@@ -21,7 +21,7 @@ type getMessagesRequest struct {
 	ConvID string `json:"conv_id"`
 }
 type getMessagesResponse struct {
-	Messages []Message `json:"messages,omitempty"`
+	Messages []Message `json:"messages"`
 	Err      error     `json:"err,omitempty"`
 }
 

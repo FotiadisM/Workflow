@@ -2,6 +2,7 @@ package conversations
 
 import (
 	"context"
+	"encoding/json"
 	"net/http"
 
 	httptransport "github.com/go-kit/kit/transport/http"
@@ -39,19 +40,29 @@ func NewHTTPRouter(e Endpoints, r *mux.Router, options ...httptransport.ServerOp
 }
 
 func decodeGetConversations(ctx context.Context, r *http.Request) (request interface{}, err error) {
+	var req getConversationsRequest
+	err = json.NewDecoder(r.Body).Decode(&req)
 
-	return
+	return req, err
 }
 
 func decodePostConversations(ctx context.Context, r *http.Request) (request interface{}, err error) {
+	var req postConversationsRequest
+	err = json.NewDecoder(r.Body).Decode(&req)
 
-	return
+	return req, err
 }
 
 func decodeGetMessages(ctx context.Context, r *http.Request) (request interface{}, err error) {
-	return
+	var req getMessagesRequest
+	err = json.NewDecoder(r.Body).Decode(&req)
+
+	return req, err
 }
 
 func decodePostMessage(ctx context.Context, r *http.Request) (request interface{}, err error) {
-	return
+	var req postMessageRequest
+	err = json.NewDecoder(r.Body).Decode(&req)
+
+	return req, err
 }

@@ -1,6 +1,9 @@
 package conversations
 
-import "context"
+import (
+	"context"
+	"time"
+)
 
 type Conversation struct {
 	ID         string `json:"id"`
@@ -8,16 +11,16 @@ type Conversation struct {
 }
 
 type Message struct {
-	ID       string `json:"id"`
-	ConvID   string `json:"conv_id"`
-	SenterID string `json:"senter_id"`
-	Text     string `json:"text"`
-	Time     string `json:"time"`
+	ID       string    `json:"id"`
+	ConvID   string    `json:"conv_id"`
+	SenterID string    `json:"senter_id"`
+	Text     string    `json:"text"`
+	Time     time.Time `json:"time"`
 }
 
 type Repository interface {
 	GetConversations(ctx context.Context, userID string) (convs []Conversation, err error)
 	CreateConversation(ctx context.Context, userID, convUserID string) (convID string, err error)
 	GetConversationMessages(ctx context.Context, convID string) (msgs []Message, err error)
-	CreateConversationMessage(ctx context.Context, convID, senterID, text string) (msgID, timeSent string, err error)
+	CreateConversationMessage(ctx context.Context, convID, senterID, text string) (msgID string, timeSent time.Time, err error)
 }
