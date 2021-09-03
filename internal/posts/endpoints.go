@@ -7,22 +7,22 @@ import (
 )
 
 type Endpoints struct {
-	getPostsEndpoint    endpoint.Endpoint
-	postPostsEndpoint   endpoint.Endpoint
-	getCommentsEndpoint endpoint.Endpoint
-	postCommentEndpoint endpoint.Endpoint
-	likePostEndpoint    endpoint.Endpoint
-	likeCommentEndpoint endpoint.Endpoint
+	getPostsEndpoint          endpoint.Endpoint
+	createPostsEndpoint       endpoint.Endpoint
+	getPostCommentEndpoint    endpoint.Endpoint
+	createPostCommentEndpoint endpoint.Endpoint
+	togglePostLikeEndpoint    endpoint.Endpoint
+	toggleCommentLikeEndpoint endpoint.Endpoint
 }
 
 func NewEndpoints(s Service) Endpoints {
 	return Endpoints{
 		makeGetPostEndpoint(s),
-		makePostPostEndpoint(s),
-		makeGetCommentsEndpoint(s),
-		makePostCommentEndpoint(s),
-		makeLikePostEndpoint(s),
-		makeLikeCommentEndpoint(s),
+		makeCreatePostEndpoint(s),
+		makeGetPostCommentEndpoint(s),
+		makeCreatePostCommentEndpoint(s),
+		makeTogglePostLikeEndpoint(s),
+		makeToggleCommentLikeEndpoint(s),
 	}
 }
 
@@ -35,46 +35,46 @@ func makeGetPostEndpoint(s Service) endpoint.Endpoint {
 	}
 }
 
-func makePostPostEndpoint(s Service) endpoint.Endpoint {
+func makeCreatePostEndpoint(s Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
-		req := request.(postPostRequest)
-		res, err := s.postPost(ctx, req)
+		req := request.(createPostRequest)
+		res, err := s.createPost(ctx, req)
 
 		return res, err
 	}
 }
 
-func makeGetCommentsEndpoint(s Service) endpoint.Endpoint {
+func makeGetPostCommentEndpoint(s Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
-		req := request.(getCommentsRequest)
-		res, err := s.getComments(ctx, req)
+		req := request.(getPostCommentRequest)
+		res, err := s.getPostComment(ctx, req)
 
 		return res, err
 	}
 }
 
-func makePostCommentEndpoint(s Service) endpoint.Endpoint {
+func makeCreatePostCommentEndpoint(s Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
-		req := request.(postCommentRequest)
-		res, err := s.postComment(ctx, req)
+		req := request.(createPostCommentRequest)
+		res, err := s.createPostComment(ctx, req)
 
 		return res, err
 	}
 }
 
-func makeLikePostEndpoint(s Service) endpoint.Endpoint {
+func makeTogglePostLikeEndpoint(s Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
-		req := request.(likePostRequest)
-		res, err := s.likePost(ctx, req)
+		req := request.(togglePostLikeRequest)
+		res, err := s.togglePostLike(ctx, req)
 
 		return res, err
 	}
 }
 
-func makeLikeCommentEndpoint(s Service) endpoint.Endpoint {
+func makeToggleCommentLikeEndpoint(s Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
-		req := request.(likeCommentRequest)
-		res, err := s.likeComment(ctx, req)
+		req := request.(toggleCommentLikeRequest)
+		res, err := s.toggleCommentLike(ctx, req)
 
 		return res, err
 	}

@@ -15,7 +15,7 @@ func (r Repository) GetUserPassword(ctx context.Context, email string) (password
 	return
 }
 
-func (r Repository) CreateUser(ctx context.Context, fName, lName, email, password string) (id string, err error) {
+func (r Repository) CreateUser(ctx context.Context, fName, lName, email, company, position, profilePic, password string) (id string, err error) {
 	err = crdbpgx.ExecuteTx(ctx, r.db, pgx.TxOptions{}, func(tx pgx.Tx) error {
 		if _, err := tx.Exec(ctx, `INSERT INTO auth (email, password) VALUES ($1, $2)`, email, password); err != nil {
 			pgErr, ok := err.(*pgconn.PgError)
@@ -28,10 +28,10 @@ func (r Repository) CreateUser(ctx context.Context, fName, lName, email, passwor
 		}
 
 		err := tx.QueryRow(ctx, `INSERT INTO users
-			(f_name, l_name, email, company, position, role)
-			VALUES ($1, $2, $3, $4, $5, $6)
+			(f_name, l_name, email, company, position, profile_pic, role)
+			VALUES ($1, $2, $3, $4, $5, $6, $7)
 			RETURNING id`,
-			fName, lName, email, "-", "-", user.Normal).Scan(&id)
+			fName, lName, email, company, position, profilePic, user.Normal).Scan(&id)
 
 		return err
 	})

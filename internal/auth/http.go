@@ -27,15 +27,31 @@ func NewHTTPRouter(e Endpoints, r *mux.Router, options ...httptransport.ServerOp
 }
 
 func decodeSignInRequest(ctx context.Context, r *http.Request) (request interface{}, err error) {
-	var res signInRequest
-	err = json.NewDecoder(r.Body).Decode(&res)
+	var req signInRequest
+	err = json.NewDecoder(r.Body).Decode(&req)
 
-	return res, err
+	return req, err
 }
 
 func decodeSignUpRequest(ctx context.Context, r *http.Request) (request interface{}, err error) {
-	var res signUpRequest
-	err = json.NewDecoder(r.Body).Decode(&res)
+	var req signUpRequest
+	err = r.ParseMultipartForm(32 << 20)
+	if err != nil {
+		return
+	}
 
-	return res, err
+	f, _, err := r.FormFile("profile")
+	if err != nil {
+		return
+	}
+
+	req.FName = r.MultipartForm.Value["f_name"][0]
+	req.LName = r.MultipartForm.Value["l_name"][0]
+	req.Email = r.MultipartForm.Value["email"][0]
+	req.Company = r.MultipartForm.Value["company"][0]
+	req.Position = r.MultipartForm.Value["position"][0]
+	req.Password = r.MultipartForm.Value["password"][0]
+	req.ProfilePic = f
+
+	return req, err
 }

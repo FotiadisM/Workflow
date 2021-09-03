@@ -10,18 +10,20 @@ import (
 
 func (r Repository) GetUserByID(ctx context.Context, id string) (u user.User, err error) {
 	err = r.db.QueryRow(ctx, `
-	SELECT
-		(id, f_name, l_name, email, company, position)
-	FROM users WHERE id=$1`, id).Scan(&u.ID, &u.FName, &u.LName, &u.Email, &u.Company, &u.Position)
+		SELECT
+			id, f_name, l_name, email, company, position
+		FROM users WHERE id=$1
+	`, id).Scan(&u.ID, &u.FName, &u.LName, &u.Email, &u.Company, &u.Position)
 
 	return
 }
 
 func (r Repository) GetPerpetator(ctx context.Context, id string) (u user.User, err error) {
 	err = r.db.QueryRow(ctx, `
-	SELECT
-		(f_name, l_name, email, company, position)
-	FROM users WHERE id=$1`, id).Scan(&u.FName, &u.LName, &u.Email, &u.Company, &u.Position)
+		SELECT
+			f_name, l_name, email, company, position
+		FROM users WHERE id=$1
+	`, id).Scan(&u.FName, &u.LName, &u.Email, &u.Company, &u.Position)
 
 	return
 }

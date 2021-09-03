@@ -1,21 +1,46 @@
 package posts
 
+import (
+	"context"
+	"io"
+	"time"
+)
+
+type PostVisibility string
+
+const (
+	All     PostVisibility = "all"
+	Friends                = "friends"
+	Nopne                  = "none"
+)
+
 type Post struct {
-	ID      string
-	UserID  string
-	Created string
-	Likes   int
-	Text    string
+	ID         string         `json:"id"`
+	UserID     string         `json:"user_id"`
+	Text       string         `json:"text"`
+	Images     []string       `json:"images"`
+	Videos     []string       `json:"videos"`
+	Visivility PostVisibility `json:"-"`
+	Likes      []string       `json:"likes"`
+	Comments   []string       `json:"comments"`
+	Created    string         `json:"created"`
 }
 
 type Comment struct {
-	ID      string
-	PostID  string
-	UserID  string
-	Created string
-	Likes   int
-	Text    string
+	ID      string   `json:"id"`
+	PostID  string   `json:"post_id"`
+	UserID  string   `json:"user_id"`
+	Text    string   `json:"text"`
+	Likes   []string `json:"likes"`
+	Created string   `json:"created"`
 }
 
 type Repository interface {
+	CreatePost(ctx context.Context, userID, text, visivility string, images, videos []string) (id string, created time.Time, err error)
+	GetPost(ctx context.Context, postID string) (p *Post, err error)
+	TogglePostLike(ctx context.Context, postID, userID string) (err error)
+	CreatePostComment(ctx context.Context, postID, userID, text string) (id string, created time.Time, err error)
+	GetPostComment(ctx context.Context, postID string) (c *Comment, err error)
+	ToggleCommentLike(ctx context.Context, commentID, userID string) (err error)
+	PostFile(ctx context.Context, file io.Reader) (id string, err error)
 }

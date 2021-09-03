@@ -42,69 +42,98 @@ func NewRepository(ctx context.Context, dbURL string) (r Repository, err error) 
 }
 
 func (r Repository) initDatabase(ctx context.Context) (err error) {
-	_, err = r.db.Exec(ctx, `CREATE TABLE IF NOT EXISTS auth (
+	if _, err = r.db.Exec(ctx, `
+	CREATE TABLE IF NOT EXISTS auth (
 		email STRING(90) PRIMARY KEY,
 		password STRING NOT NULL
-	);`)
-	if err != nil {
+	);`); err != nil {
 		return
 	}
 
-	_, err = r.db.Exec(ctx, `CREATE TABLE IF NOT EXISTS users (
+	if _, err = r.db.Exec(ctx, `
+	CREATE TABLE IF NOT EXISTS users (
 		id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
 		f_name STRING(60) NOT NULL,
 		l_name STRING(60) NOT NULL,
 		email STRING REFERENCES public.auth(email),
 		company STRING(60) NOT NULL,
 		position STRING(60) NOT NULL,
+		profile_pic STRING NOT NULL,
 		role STRING(60) NOT NULL
-	);`)
-	if err != nil {
+	);`); err != nil {
 		return
 	}
 
 	// connections
-	_, err = r.db.Exec(ctx, `CREATE TABLE IF NOT EXISTS connections (
+	if _, err = r.db.Exec(ctx, `
+	CREATE TABLE IF NOT EXISTS connections (
 		id UUID UNIQUE,
 		user1_id UUID REFERENCES public.users(id),
 		user2_id UUID REFERENCES public.users(id),
 	  
 		CONSTRAINT "primary" PRIMARY KEY (user1_id, user2_id)
-	);`)
-	if err != nil {
+	);`); err != nil {
 		return
 	}
 
-	_, err = r.db.Exec(ctx, `CREATE TABLE IF NOT EXISTS connection_requests (
+	if _, err = r.db.Exec(ctx, `
+	CREATE TABLE IF NOT EXISTS connection_requests (
 		id UUID UNIQUE DEFAULT gen_random_uuid(),
 		user1_id UUID REFERENCES public.users(id),
 		user2_id UUID REFERENCES public.users(id),
-	  
+  
 		CONSTRAINT "primary" PRIMARY KEY (user1_id, user2_id)
-	);`)
-	if err != nil {
+	);`); err != nil {
 		return
 	}
 
-	_, err = r.db.Exec(ctx, `CREATE TABLE IF NOT EXISTS conversations (
+	if _, err = r.db.Exec(ctx, `
+	CREATE TABLE IF NOT EXISTS conversations (
 		id UUID UNIQUE DEFAULT gen_random_uuid(),
 		user1_id UUID REFERENCES public.users(id),
 		user2_id UUID REFERENCES public.users(id),
-	  
+  
 		CONSTRAINT "primary" PRIMARY KEY (user1_id, user2_id)
-	  );`)
-	if err != nil {
+	);`); err != nil {
 		return
 	}
 
-	_, err = r.db.Exec(ctx, `CREATE TABLE IF NOT EXISTS messages (
+	if _, err = r.db.Exec(ctx, `
+	CREATE TABLE IF NOT EXISTS messages (
 		id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
 		conv_id UUID REFERENCES public.conversations(id),
 		senter_id UUID REFERENCES public.users(id),
 		text STRING NOT NULL,
 		time_sent TIMESTAMP DEFAULT now()
-	  );`)
-	if err != nil {
+	);`); err != nil {
+		return
+	}
+
+	// posts
+	if _, err = r.db.Exec(ctx, `
+	CREATE TABLE IF NOT EXISTS posts (
+		id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+		user_id UUID REFERENCES public.users(id),
+		text STRING,
+		images STRING[],
+		videos STRING[],
+		visibility STRING,
+		likes STRING[],
+		comments STRING[],
+		created TIMESTAMP DEFAULT now()
+	);`); err != nil {
+		return
+	}
+
+	if _, err = r.db.Exec(ctx, `
+	CREATE TABLE IF NOT EXISTS comments (
+		id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+		post_id UUID REFERENCES public.posts(id),
+		user_id UUID REFERENCES public.users(id),
+		text STRING,
+		likes STRING[],
+		created TIMESTAMP DEFAULT now()
+	);`); err != nil {
 		return
 	}
 

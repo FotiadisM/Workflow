@@ -23,6 +23,7 @@ func NewService(r Repository) Service {
 
 func (s service) getUser(ctx context.Context, req getUserRequest) (res getUserResponse, err error) {
 	u, err := s.repo.GetUserByID(ctx, req.UserID)
+
 	if err != nil {
 		res.Err = errors.New("failed to fetch user")
 		return

@@ -10,7 +10,7 @@ import (
 
 func NewHTTPHandler(e Endpoints, r *mux.Router, options ...httptransport.ServerOption) {
 
-	r.Methods("GET").Path("/").Handler(httptransport.NewServer(
+	r.Methods("GET").Path("/{id}").Handler(httptransport.NewServer(
 		e.getUserEndpoint,
 		decodeGetUserRequest,
 		httptransport.EncodeJSONResponse,
@@ -47,17 +47,24 @@ func NewHTTPHandler(e Endpoints, r *mux.Router, options ...httptransport.ServerO
 }
 
 func decodeGetUserRequest(ctx context.Context, r *http.Request) (request interface{}, err error) {
-	return
+	vars := mux.Vars(r)
+	id := vars["id"]
+
+	return getUserRequest{UserID: id}, nil
 }
+
 func decodeGetPerpetatorRequest(ctx context.Context, r *http.Request) (request interface{}, err error) {
 	return
 }
+
 func decodeGetConnectionsRequest(ctx context.Context, r *http.Request) (request interface{}, err error) {
 	return
 }
+
 func decodePostConnectionRequest(ctx context.Context, r *http.Request) (request interface{}, err error) {
 	return
 }
+
 func decodeChangeConnectionRequest(ctx context.Context, r *http.Request) (request interface{}, err error) {
 	return
 }

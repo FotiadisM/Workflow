@@ -53,9 +53,16 @@ func (s service) signUp(ctx context.Context, req signUpRequest) (res signUpRespo
 		return
 	}
 
+	fileID, err := s.repo.PostFile(ctx, req.ProfilePic)
+	if err != nil {
+		return
+	}
+
 	fName := strings.Title(req.FName)
 	lName := strings.Title(req.LName)
-	id, err := s.repo.CreateUser(ctx, fName, lName, req.Email, string(hashedPassword))
+	company := strings.Title(req.Company)
+	posistion := strings.Title(req.Position)
+	id, err := s.repo.CreateUser(ctx, fName, lName, req.Email, company, posistion, fileID, string(hashedPassword))
 	if err != nil {
 		return
 	}
@@ -64,8 +71,9 @@ func (s service) signUp(ctx context.Context, req signUpRequest) (res signUpRespo
 	res.User.FName = fName
 	res.User.LName = lName
 	res.User.Email = req.Email
-	res.User.Company = "-"
-	res.User.Position = "-"
+	res.User.Company = company
+	res.User.Position = posistion
+	res.User.ProfilePic = fileID
 	res.User.Role = user.Normal
 
 	return

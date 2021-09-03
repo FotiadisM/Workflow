@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"syscall"
 
 	"github.com/FotiadisM/workflow-server/internal/auth"
@@ -15,8 +16,10 @@ import (
 	"github.com/FotiadisM/workflow-server/internal/repository"
 	"github.com/FotiadisM/workflow-server/internal/user"
 	"github.com/FotiadisM/workflow-server/pkg/middleware"
+
 	"github.com/go-kit/kit/log"
 	httptransport "github.com/go-kit/kit/transport/http"
+	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 )
 
@@ -28,6 +31,7 @@ var (
 func init() {
 	if p := os.Getenv("PORT"); p != "" {
 		httpPort = p
+
 	}
 
 	if url := os.Getenv("DB_URL"); url != "" {
@@ -51,7 +55,12 @@ func main() {
 	ctx := context.Background()
 	repo, err := repository.NewRepository(ctx, dbURL)
 	if err != nil {
-		panic(fmt.Sprintf("Failed at creating Repository: %s", err))
+		panic(fmt.Errorf("Failed at creating Repository: %w", err))
+	}
+
+	fp := repository.FilesPath
+	if err = os.MkdirAll(fp, 0777); err != nil {
+		panic(fmt.Errorf("failed to create folder for files %w", err))
 	}
 
 	options := []httptransport.ServerOption{
@@ -81,11 +90,20 @@ func main() {
 		jobsSvc := jobs.NewService(repo)
 		jobEnds := jobs.NewEndpoints(jobsSvc)
 		jobs.NewHTTPRouter(jobEnds, r.PathPrefix("/jobs").Subrouter(), options...)
+
+		r.HandleFunc("/static/{name}", func(rw http.ResponseWriter, r *http.Request) {
+			vars := mux.Vars(r)
+			http.ServeFile(rw, r, filepath.Join(repository.FilesPath, vars["name"]))
+		})
 	}
+
+	co := handlers.AllowedOrigins([]string{"http://localhost:3000", "*"})
+	ch := handlers.AllowedHeaders([]string{"*"})
+	cm := handlers.AllowedMethods([]string{"*"})
 
 	httpServer := &http.Server{
 		Addr:    "0.0.0.0:" + httpPort,
-		Handler: r,
+		Handler: handlers.CORS(co, ch, cm)(r),
 	}
 
 	errc := make(chan error)
