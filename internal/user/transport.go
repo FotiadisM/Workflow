@@ -12,11 +12,12 @@ type getPerpetatorRequest struct {
 	PerpID string `json:"perp_id"`
 }
 type getPerpetatorResponse struct {
-	FName    string `json:"f_name,omitempty"`
-	LName    string `json:"l_name,omitempty"`
-	Company  string `json:"company,omitempty"`
-	Position string `json:"position,omitempty"`
-	Err      error  `json:"err,omitempty"`
+	FName      string `json:"f_name,omitempty"`
+	LName      string `json:"l_name,omitempty"`
+	Company    string `json:"company,omitempty"`
+	Position   string `json:"position,omitempty"`
+	ProfilePic string `json:"profile_pic"`
+	Err        error  `json:"err,omitempty"`
 }
 
 type getConnectionsRequest struct {

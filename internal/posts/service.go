@@ -66,7 +66,7 @@ func (s service) createPost(ctx context.Context, req createPostRequest) (res cre
 		Videos:   videos,
 		Likes:    []string{req.UserID},
 		Comments: []string{},
-		Created:  t.String(),
+		Created:  t.Format("1/2 15:04"),
 	}
 
 	return
@@ -96,7 +96,7 @@ func (s service) createPostComment(ctx context.Context, req createPostCommentReq
 		UserID:  req.UserID,
 		Text:    req.Text,
 		Likes:   []string{req.UserID},
-		Created: t.String(),
+		Created: t.Format("1/2 15:04"),
 	}
 	return res, nil
 }

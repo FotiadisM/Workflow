@@ -18,13 +18,14 @@ func (r Repository) PostFile(ctx context.Context, file io.Reader) (id string, er
 	if err != nil {
 		return
 	}
+	id = uid.String()
 
 	b, err := io.ReadAll(file)
 	if err != nil {
 		return
 	}
 
-	err = os.WriteFile(filepath.Join(FilesPath, uid.String()), b, 0777)
+	err = os.WriteFile(filepath.Join(FilesPath, id), b, 0777)
 
 	return
 }

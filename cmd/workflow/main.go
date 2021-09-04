@@ -98,8 +98,8 @@ func main() {
 	}
 
 	co := handlers.AllowedOrigins([]string{"http://localhost:3000", "*"})
-	ch := handlers.AllowedHeaders([]string{"*"})
-	cm := handlers.AllowedMethods([]string{"*"})
+	ch := handlers.AllowedHeaders([]string{"Content-Type", "*"})
+	cm := handlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE", "*"})
 
 	httpServer := &http.Server{
 		Addr:    "0.0.0.0:" + httpPort,

@@ -21,9 +21,9 @@ func (r Repository) GetUserByID(ctx context.Context, id string) (u user.User, er
 func (r Repository) GetPerpetator(ctx context.Context, id string) (u user.User, err error) {
 	err = r.db.QueryRow(ctx, `
 		SELECT
-			f_name, l_name, email, company, position
+			f_name, l_name, email, company, position, profile_pic
 		FROM users WHERE id=$1
-	`, id).Scan(&u.FName, &u.LName, &u.Email, &u.Company, &u.Position)
+	`, id).Scan(&u.FName, &u.LName, &u.Email, &u.Company, &u.Position, &u.ProfilePic)
 
 	return
 }

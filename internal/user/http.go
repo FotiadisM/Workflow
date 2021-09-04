@@ -17,14 +17,14 @@ func NewHTTPHandler(e Endpoints, r *mux.Router, options ...httptransport.ServerO
 		options...,
 	))
 
-	r.Methods("GET").Path("/perpetator").Handler(httptransport.NewServer(
+	r.Methods("GET").Path("/perpetrator/{id}").Handler(httptransport.NewServer(
 		e.getPerpetatorEndpoint,
 		decodeGetPerpetatorRequest,
 		httptransport.EncodeJSONResponse,
 		options...,
 	))
 
-	r.Methods("GET").Path("/connections").Handler(httptransport.NewServer(
+	r.Methods("GET").Path("/connections/{id}").Handler(httptransport.NewServer(
 		e.getConnectionsEndpoint,
 		decodeGetConnectionsRequest,
 		httptransport.EncodeJSONResponse,
@@ -54,7 +54,9 @@ func decodeGetUserRequest(ctx context.Context, r *http.Request) (request interfa
 }
 
 func decodeGetPerpetatorRequest(ctx context.Context, r *http.Request) (request interface{}, err error) {
-	return
+	vars := mux.Vars(r)
+	id := vars["id"]
+	return getPerpetatorRequest{PerpID: id}, nil
 }
 
 func decodeGetConnectionsRequest(ctx context.Context, r *http.Request) (request interface{}, err error) {

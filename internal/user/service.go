@@ -23,9 +23,8 @@ func NewService(r Repository) Service {
 
 func (s service) getUser(ctx context.Context, req getUserRequest) (res getUserResponse, err error) {
 	u, err := s.repo.GetUserByID(ctx, req.UserID)
-
 	if err != nil {
-		res.Err = errors.New("failed to fetch user")
+		res.Err = err
 		return
 	}
 
@@ -45,6 +44,7 @@ func (s service) getPerpetator(ctx context.Context, req getPerpetatorRequest) (r
 	res.LName = u.LName
 	res.Company = u.Company
 	res.Position = u.Position
+	res.ProfilePic = u.ProfilePic
 
 	return
 }

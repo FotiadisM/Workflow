@@ -5,6 +5,9 @@ import (
 	"time"
 
 	"github.com/FotiadisM/workflow-server/internal/posts"
+
+	"github.com/cockroachdb/cockroach-go/v2/crdb/crdbpgx"
+	"github.com/jackc/pgx/v4"
 )
 
 func (r Repository) CreatePost(ctx context.Context, userID, text, visibility string, images, videos []string) (id string, created time.Time, err error) {
@@ -25,7 +28,7 @@ func (r Repository) GetPost(ctx context.Context, postID string) (p *posts.Post, 
 	err = r.db.QueryRow(ctx, `
 		SELECT * FROM posts WHERE id=$1
 	;`, postID).Scan(&(p.ID), &(p.UserID), &(p.Text), &(p.Images), &(p.Videos), &(p.Visivility), &(p.Likes), &(p.Comments), &t)
-	p.Created = t.String()
+	p.Created = t.Format("1/2 15:04")
 
 	return
 }
@@ -35,13 +38,24 @@ func (r Repository) TogglePostLike(ctx context.Context, postID, userID string) (
 }
 
 func (r Repository) CreatePostComment(ctx context.Context, postID, userID, text string) (id string, created time.Time, err error) {
-	err = r.db.QueryRow(ctx, `
-	INSERT INTO comments
-		(post_id, user_id, likes)
-	VALUES
-		($1, $2, $3)
-	RETURNING id, created
-	;`, postID, userID, []string{userID}).Scan(&id, &created)
+	err = crdbpgx.ExecuteTx(ctx, r.db, pgx.TxOptions{}, func(tx pgx.Tx) error {
+		err = r.db.QueryRow(ctx, `
+			INSERT INTO comments
+				(post_id, user_id, text, likes)
+			VALUES
+				($1, $2, $3, $4)
+			RETURNING id, created
+		;`, postID, userID, text, []string{userID}).Scan(&id, &created)
+
+		tx.Exec(ctx, `
+			UPDATE posts SET
+				comments = array_append(comments, $1)
+			WHERE
+				id = $2
+		`, id, postID)
+
+		return err
+	})
 
 	return
 }
@@ -52,7 +66,7 @@ func (r Repository) GetPostComment(ctx context.Context, commentID string) (c *po
 	err = r.db.QueryRow(ctx, `
 		SELECT * FROM Comments WHERE id=$1
 	;`, commentID).Scan(&(c.ID), &(c.PostID), &(c.UserID), &(c.Text), &(c.Likes), &t)
-	c.Created = t.String()
+	c.Created = t.Format("1/2 15:04")
 
 	return
 }
