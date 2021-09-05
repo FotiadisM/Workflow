@@ -1,13 +1,15 @@
 package jobs
 
-import "context"
+import (
+	"context"
+)
 
 type Service interface {
 	getJobs(ctx context.Context, req getJobsRequest) (res getJobsResponse, err error)
-	postJob(ctx context.Context, req postJobRequest) (res postJobResponse, err error)
-	getJobsInterested(ctx context.Context, req getJobsInterestedRequest) (res getJobsInterestedResponse, err error)
-	getJobsApplied(ctx context.Context, req getJobsAppliedRequest) (res getJobsAppliedResponse, err error)
-	changeJobStatus(ctx context.Context, req changeJobStatusRequest) (res changeJobStatusResponse, err error)
+	createJob(ctx context.Context, req createJobRequest) (res createJobResponse, err error)
+	toggleJobInterested(ctx context.Context, req toggleJobInterestedRequest) (res toggleJobInterestedResponse, err error)
+	applyJob(ctx context.Context, req applyJobRequest) (res applyJobResponse, err error)
+	updateJob(ctx context.Context, req updateJobRequest) (res updateJobResponse, err error)
 }
 
 type service struct {
@@ -19,22 +21,36 @@ func NewService(r Repository) Service {
 }
 
 func (s service) getJobs(ctx context.Context, req getJobsRequest) (res getJobsResponse, err error) {
-	res.Name = "test worked!"
+	js, err := s.repo.GetJobs(ctx)
+	if err != nil {
+		res.Err = err
+		return
+	}
+
+	res.Jobs = js
 	return
 }
 
-func (s service) postJob(ctx context.Context, req postJobRequest) (res postJobResponse, err error) {
+func (s service) createJob(ctx context.Context, req createJobRequest) (res createJobResponse, err error) {
+	id, t, err := s.repo.CreateJob(ctx, req.UserID, req.Title, string(req.Type), req.Location, req.Company, req.Description, req.MinSalary, req.MaxSalary, req.Skills)
+	if err != nil {
+		res.Err = err
+		return
+	}
+
+	res.ID = id
+	res.Created = t.Format("Jan 2")
 	return
 }
 
-func (s service) getJobsInterested(ctx context.Context, req getJobsInterestedRequest) (res getJobsInterestedResponse, err error) {
-	return
+func (s service) toggleJobInterested(ctx context.Context, req toggleJobInterestedRequest) (res toggleJobInterestedResponse, err error) {
+	panic("not implemented") // TODO: Implement
 }
 
-func (s service) getJobsApplied(ctx context.Context, req getJobsAppliedRequest) (res getJobsAppliedResponse, err error) {
-	return
+func (s service) applyJob(ctx context.Context, req applyJobRequest) (res applyJobResponse, err error) {
+	panic("not implemented") // TODO: Implement
 }
 
-func (s service) changeJobStatus(ctx context.Context, req changeJobStatusRequest) (res changeJobStatusResponse, err error) {
-	return
+func (s service) updateJob(ctx context.Context, req updateJobRequest) (res updateJobResponse, err error) {
+	panic("not implemented") // TODO: Implement
 }

@@ -2,6 +2,7 @@ package jobs
 
 import (
 	"context"
+	"encoding/json"
 	"net/http"
 
 	httptransport "github.com/go-kit/kit/transport/http"
@@ -17,29 +18,29 @@ func NewHTTPRouter(e Endpoints, r *mux.Router, options ...httptransport.ServerOp
 	))
 
 	r.Methods("POST").Path("/").Handler(httptransport.NewServer(
-		e.postJobEndpoint,
-		decodePostJobRequest,
+		e.createJobEndpoint,
+		decodeCreateJobRequest,
 		httptransport.EncodeJSONResponse,
 		options...,
 	))
 
-	r.Methods("GET").Path("/interested").Handler(httptransport.NewServer(
-		e.getJobsInterestedEndpoint,
-		decodeGetJobsInterestedRequest,
+	r.Methods("POST").Path("/interested").Handler(httptransport.NewServer(
+		e.toggleJobInterestedEndpoint,
+		decodeToggleJobsInterestedRequest,
 		httptransport.EncodeJSONResponse,
 		options...,
 	))
 
-	r.Methods("GET").Path("/applied").Handler(httptransport.NewServer(
-		e.getJobsAppliedEndpoint,
-		decodeGetJobsAppliedRequest,
+	r.Methods("POST").Path("/apply").Handler(httptransport.NewServer(
+		e.applyJobEndpoint,
+		decodeApplyJobRequest,
 		httptransport.EncodeJSONResponse,
 		options...,
 	))
 
-	r.Methods("PUT").Path("/change/status").Handler(httptransport.NewServer(
-		e.changeJobStatusEndpoint,
-		decodeChangeJobStatusRequest,
+	r.Methods("PUT").Path("/").Handler(httptransport.NewServer(
+		e.updateJobStatusEndpoint,
+		decodeUpdateJobRequest,
 		httptransport.EncodeJSONResponse,
 		options...,
 	))
@@ -49,18 +50,20 @@ func decodeGetJobsRequest(_ context.Context, r *http.Request) (request interface
 	return getJobsRequest{}, nil
 }
 
-func decodePostJobRequest(_ context.Context, r *http.Request) (request interface{}, err error) {
-	return
+func decodeCreateJobRequest(_ context.Context, r *http.Request) (request interface{}, err error) {
+	var req createJobRequest
+	err = json.NewDecoder(r.Body).Decode(&req)
+	return req, err
 }
 
-func decodeGetJobsInterestedRequest(_ context.Context, r *http.Request) (request interface{}, err error) {
-	return
+func decodeToggleJobsInterestedRequest(_ context.Context, r *http.Request) (request interface{}, err error) {
+	panic("not implemented") // TODO: Implement
 }
 
-func decodeGetJobsAppliedRequest(_ context.Context, r *http.Request) (request interface{}, err error) {
-	return
+func decodeApplyJobRequest(_ context.Context, r *http.Request) (request interface{}, err error) {
+	panic("not implemented") // TODO: Implement
 }
 
-func decodeChangeJobStatusRequest(_ context.Context, r *http.Request) (request interface{}, err error) {
-	return
+func decodeUpdateJobRequest(_ context.Context, r *http.Request) (request interface{}, err error) {
+	panic("not implemented") // TODO: Implement
 }

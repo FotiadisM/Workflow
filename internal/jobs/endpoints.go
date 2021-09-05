@@ -8,19 +8,19 @@ import (
 
 type Endpoints struct {
 	getJobsEndpoint           endpoint.Endpoint
-	postJobEndpoint           endpoint.Endpoint
-	getJobsInterestedEndpoint endpoint.Endpoint
-	getJobsAppliedEndpoint    endpoint.Endpoint
-	changeJobStatusEndpoint   endpoint.Endpoint
+	createJobEndpoint           endpoint.Endpoint
+	toggleJobInterestedEndpoint endpoint.Endpoint
+	applyJobEndpoint endpoint.Endpoint
+	updateJobStatusEndpoint   endpoint.Endpoint
 }
 
 func NewEndpoints(s Service) Endpoints {
 	return Endpoints{
 		makeGetJobsEndpoint(s),
-		makePostJobEndpoint(s),
-		makeGetJobsInterestedEndpoint(s),
-		makeGetJobsAppliedEndpoint(s),
-		makeChangeJobStatusEndpoint(s),
+		makeCreateJobEndpoint(s),
+		makeToggleJobInterested(s),
+		makeApplyJob(s),
+		makeUpdateJobEndpoint(s),
 	}
 }
 
@@ -33,37 +33,37 @@ func makeGetJobsEndpoint(s Service) endpoint.Endpoint {
 	}
 }
 
-func makePostJobEndpoint(s Service) endpoint.Endpoint {
+func makeCreateJobEndpoint(s Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
-		req := request.(postJobRequest)
-		res, err := s.postJob(ctx, req)
+		req := request.(createJobRequest)
+		res, err := s.createJob(ctx, req)
 
 		return res, err
 	}
 }
 
-func makeGetJobsInterestedEndpoint(s Service) endpoint.Endpoint {
+func makeToggleJobInterested(s Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
-		req := request.(getJobsInterestedRequest)
-		res, err := s.getJobsInterested(ctx, req)
+		req := request.(toggleJobInterestedRequest)
+		res, err := s.toggleJobInterested(ctx, req)
 
 		return res, err
 	}
 }
 
-func makeGetJobsAppliedEndpoint(s Service) endpoint.Endpoint {
+func makeApplyJob(s Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
-		req := request.(getJobsAppliedRequest)
-		res, err := s.getJobsApplied(ctx, req)
+		req := request.(applyJobRequest)
+		res, err := s.applyJob(ctx, req)
 
 		return res, err
 	}
 }
 
-func makeChangeJobStatusEndpoint(s Service) endpoint.Endpoint {
+func makeUpdateJobEndpoint(s Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
-		req := request.(changeJobStatusRequest)
-		res, err := s.changeJobStatus(ctx, req)
+		req := request.(updateJobRequest)
+		res, err := s.updateJob(ctx, req)
 
 		return res, err
 	}

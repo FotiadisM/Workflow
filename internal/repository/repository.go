@@ -137,5 +137,25 @@ func (r Repository) initDatabase(ctx context.Context) (err error) {
 		return
 	}
 
+	// jobs
+	if _, err = r.db.Exec(ctx, `
+	CREATE TABLE IF NOT EXISTS jobs (
+		id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+		user_id UUID REFERENCES public.users(id),
+		title STRING NOT NULL,
+		type STRING NOT NULL,
+		location STRING NOT NULL,
+		company STRING NOT NULL,
+		min FLOAT8 NOT NULL,
+		max FLOAT8 NOT NULL,
+		description STRING,
+		skills STRING[],
+		interested STRING[],
+		applied STRING[],
+		created TIMESTAMP DEFAULT now()
+	);`); err != nil {
+		return
+	}
+
 	return
 }

@@ -2,17 +2,43 @@ package jobs
 
 type getJobsRequest struct{}
 type getJobsResponse struct {
-	Name string `json:"name"`
+	Jobs []Job `json:"jobs"`
+	Err  error `json:"err,omitempty"`
 }
 
-type postJobRequest struct{}
-type postJobResponse struct{}
+type createJobRequest struct {
+	UserID      string   `json:"user_id"`
+	Title       string   `json:"title"`
+	Type        JobType  `json:"type"`
+	Location    string   `json:"location"`
+	Company     string   `json:"company"`
+	MinSalary   float64  `json:"min_salary"`
+	MaxSalary   float64  `json:"max_salary"`
+	Description string   `json:"description"`
+	Skills      []string `json:"skills"`
+}
+type createJobResponse struct {
+	ID      string `json:"id,omitempty"`
+	Created string `json:"created,omitempty"`
+	Err     error  `json:"err,omitempty"`
+}
 
-type getJobsInterestedRequest struct{}
-type getJobsInterestedResponse struct{}
+type toggleJobInterestedRequest struct {
+	UserID string `json:"user_id"`
+	JobID  string `json:"job_id"`
+}
+type toggleJobInterestedResponse struct {
+	Err error `json:"err,omitempty"`
+}
 
-type getJobsAppliedRequest struct{}
-type getJobsAppliedResponse struct{}
+type applyJobRequest struct {
+	UserID string `json:"user_id"`
+	JobID  string `json:"job_id"`
+}
+type applyJobResponse struct {
+	Err error `json:"err,omitempty"`
+}
 
-type changeJobStatusRequest struct{}
-type changeJobStatusResponse struct{}
+// TODO: complete update structs
+type updateJobRequest struct{}
+type updateJobResponse struct{}
