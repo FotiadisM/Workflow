@@ -47,7 +47,7 @@ func (r Repository) CreatePostComment(ctx context.Context, postID, userID, text 
 			RETURNING id, created
 		;`, postID, userID, text, []string{userID}).Scan(&id, &created)
 
-		tx.Exec(ctx, `
+		_, err = tx.Exec(ctx, `
 			UPDATE posts SET
 				comments = array_append(comments, $1)
 			WHERE

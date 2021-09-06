@@ -57,11 +57,15 @@ func decodeCreateJobRequest(_ context.Context, r *http.Request) (request interfa
 }
 
 func decodeToggleJobsInterestedRequest(_ context.Context, r *http.Request) (request interface{}, err error) {
-	panic("not implemented") // TODO: Implement
+	var req toggleJobInterestedRequest
+	err = json.NewDecoder(r.Body).Decode(&req)
+	return req, err
 }
 
 func decodeApplyJobRequest(_ context.Context, r *http.Request) (request interface{}, err error) {
-	panic("not implemented") // TODO: Implement
+	var req applyJobRequest
+	err = json.NewDecoder(r.Body).Decode(&req)
+	return req, err
 }
 
 func decodeUpdateJobRequest(_ context.Context, r *http.Request) (request interface{}, err error) {

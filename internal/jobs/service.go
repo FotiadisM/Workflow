@@ -44,11 +44,17 @@ func (s service) createJob(ctx context.Context, req createJobRequest) (res creat
 }
 
 func (s service) toggleJobInterested(ctx context.Context, req toggleJobInterestedRequest) (res toggleJobInterestedResponse, err error) {
-	panic("not implemented") // TODO: Implement
+	err = s.repo.ToggleJobInterested(ctx, req.UserID, req.JobID)
+
+	res.Err = err
+	return
 }
 
 func (s service) applyJob(ctx context.Context, req applyJobRequest) (res applyJobResponse, err error) {
-	panic("not implemented") // TODO: Implement
+	err = s.repo.ApplyJob(ctx, req.UserID, req.JobID)
+
+	res.Err = err
+	return
 }
 
 func (s service) updateJob(ctx context.Context, req updateJobRequest) (res updateJobResponse, err error) {

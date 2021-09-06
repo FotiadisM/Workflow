@@ -21,15 +21,15 @@ func (r Repository) GetJobs(ctx context.Context) (jobsArr []jobs.Job, err error)
 		if err = rows.Scan(&j.ID,
 			&j.UserID,
 			&j.Title,
-			&j.Type, 
-			&j.Location, 
-			&j.Company, 
-			&j.MinSalary, 
-			&j.MaxSalary, 
-			&j.Description, 
-			&j.Skills, 
-			&j.Interested, 
-			&j.Applied, 
+			&j.Type,
+			&j.Location,
+			&j.Company,
+			&j.MinSalary,
+			&j.MaxSalary,
+			&j.Description,
+			&j.Skills,
+			&j.Interested,
+			&j.Applied,
 			&t); err != nil {
 			return
 		}
@@ -53,10 +53,47 @@ func (r Repository) CreateJob(ctx context.Context, userID string, title string, 
 }
 
 func (r Repository) ToggleJobInterested(ctx context.Context, userID string, jobID string) (err error) {
-	panic("not implemented") // TODO: Implement
+	indx := []int{}
+	err = r.db.QueryRow(ctx, `
+	SELECT
+		array_positions(interested, $1)
+	FROM
+		jobs
+	WHERE
+		id=$2
+	;`, userID, jobID).Scan(&indx)
+	if err != nil {
+		return
+	}
+
+	if len(indx) == 0 {
+		// append interested
+		_, err = r.db.Exec(ctx, `
+		UPDATE jobs SET
+			interested = array_append(interested, $1)
+		WHERE
+			id = $2
+		;`, userID, jobID)
+	} else {
+		// remove interested
+		_, err = r.db.Exec(ctx, `
+		UPDATE jobs SET
+			interested = array_remove(interested, $1)
+		WHERE
+			id = $2
+		;`, userID, jobID)
+	}
+
+	return
 }
 
 func (r Repository) ApplyJob(ctx context.Context, userID string, jobID string) (err error) {
-	panic("not implemented") // TODO: Implement
-}
+	_, err = r.db.Exec(ctx, `
+	UPDATE jobs SET
+		applied = array_append(applied, $1)
+	WHERE
+		id = $2
+	;`, userID, jobID)
 
+	return
+}
