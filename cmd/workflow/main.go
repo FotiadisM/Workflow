@@ -21,7 +21,12 @@ import (
 	httptransport "github.com/go-kit/kit/transport/http"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
+	"github.com/gorilla/websocket"
 )
+
+type Session struct {
+	UserID string
+}
 
 var (
 	httpPort string = "8080"
@@ -49,6 +54,7 @@ func interruptHandler(errc chan<- error, httpServer *http.Server) {
 }
 
 func main() {
+
 	logger := log.NewLogfmtLogger(log.NewSyncWriter(os.Stdout))
 	logger = log.With(logger, "timestamp", log.DefaultTimestampUTC)
 
@@ -68,6 +74,8 @@ func main() {
 		httptransport.ServerErrorEncoder(httptransport.DefaultErrorEncoder),
 	}
 
+	var clients = make(map[*websocket.Conn]Session)
+	var broadcast = make(chan conversations.BroadCastMessage)
 	r := mux.NewRouter()
 	{
 		autSvc := auth.NewService(repo)
@@ -83,7 +91,7 @@ func main() {
 		postsEnds := posts.NewEndpoints(postsSvc)
 		posts.NewHTTPRouter(postsEnds, r.PathPrefix("/posts").Subrouter(), options...)
 
-		convSvc := conversations.NewService(repo)
+		convSvc := conversations.NewService(repo, broadcast)
 		convEnds := conversations.NewEndpoints(convSvc)
 		conversations.NewHTTPRouter(convEnds, r.PathPrefix("/conversations").Subrouter(), options...)
 
@@ -94,6 +102,36 @@ func main() {
 		r.HandleFunc("/static/{name}", func(rw http.ResponseWriter, r *http.Request) {
 			vars := mux.Vars(r)
 			http.ServeFile(rw, r, filepath.Join(repository.FilesPath, vars["name"]))
+		})
+
+		upgrader := websocket.Upgrader{
+			CheckOrigin: func(r *http.Request) bool { return true },
+		}
+		r.HandleFunc("/ws/{userID}", func(rw http.ResponseWriter, r *http.Request) {
+			vars := mux.Vars(r)
+			userID := vars["userID"]
+			conn, err := upgrader.Upgrade(rw, r, nil)
+			if err != nil {
+				fmt.Println(err)
+				return
+			}
+			defer conn.Close()
+
+			clients[conn] = Session{
+				UserID: userID,
+			}
+
+			for {
+				var msg conversations.Message
+				err = conn.ReadJSON(&msg)
+				if err != nil {
+					fmt.Println(err)
+					delete(clients, conn)
+					return
+				}
+				// TODO: store message to db
+				// broadcast <- msg
+			}
 		})
 	}
 
@@ -111,6 +149,22 @@ func main() {
 	go func() {
 		logger.Log("listening", httpPort)
 		errc <- httpServer.ListenAndServe()
+	}()
+
+	go func() {
+		for {
+			msg := <-broadcast
+
+			for conn, session := range clients {
+				if msg.Receiver == session.UserID {
+					if err := conn.WriteJSON(msg); err != nil {
+						fmt.Println(err)
+						conn.Close()
+						delete(clients, conn)
+					}
+				}
+			}
+		}
 	}()
 
 	go interruptHandler(errc, httpServer)

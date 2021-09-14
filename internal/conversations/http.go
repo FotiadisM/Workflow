@@ -24,7 +24,7 @@ func NewHTTPRouter(e Endpoints, r *mux.Router, options ...httptransport.ServerOp
 		options...,
 	))
 
-	r.Methods("GET").Path("/messages").Handler(httptransport.NewServer(
+	r.Methods("GET").Path("/messages/{id}").Handler(httptransport.NewServer(
 		e.getMessagesEndpoint,
 		decodeGetMessages,
 		httptransport.EncodeJSONResponse,
@@ -55,7 +55,8 @@ func decodePostConversations(ctx context.Context, r *http.Request) (request inte
 
 func decodeGetMessages(ctx context.Context, r *http.Request) (request interface{}, err error) {
 	var req getMessagesRequest
-	err = json.NewDecoder(r.Body).Decode(&req)
+	vars := mux.Vars(r)
+	req.ConvID = vars["id"]
 
 	return req, err
 }

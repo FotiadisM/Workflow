@@ -60,7 +60,9 @@ func decodeGetPerpetatorRequest(ctx context.Context, r *http.Request) (request i
 }
 
 func decodeGetConnectionsRequest(ctx context.Context, r *http.Request) (request interface{}, err error) {
-	return
+	vars := mux.Vars(r)
+	id := vars["id"]
+	return getConnectionsRequest{UserID: id}, nil
 }
 
 func decodePostConnectionRequest(ctx context.Context, r *http.Request) (request interface{}, err error) {

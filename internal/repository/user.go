@@ -29,7 +29,7 @@ func (r Repository) GetPerpetator(ctx context.Context, id string) (u user.User, 
 }
 
 func (r Repository) GetConnections(ctx context.Context, userID string) (cons []user.Connection, err error) {
-	rows, err := r.db.Query(ctx, ` SELECT * FROM connections WHERE user1_id=$1 OR user2_id=$1`)
+	rows, err := r.db.Query(ctx, ` SELECT * FROM connections WHERE user1_id=$1 OR user2_id=$1`, userID)
 	if err != nil {
 		return
 	}
@@ -44,9 +44,9 @@ func (r Repository) GetConnections(ctx context.Context, userID string) (cons []u
 
 		switch userID {
 		case us1:
-			con.UserID = us1
-		case us2:
 			con.UserID = us2
+		case us2:
+			con.UserID = us1
 		}
 		cons = append(cons, con)
 	}

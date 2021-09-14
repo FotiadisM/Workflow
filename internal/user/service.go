@@ -3,6 +3,7 @@ package user
 import (
 	"context"
 	"errors"
+	"fmt"
 )
 
 type Service interface {
@@ -52,7 +53,7 @@ func (s service) getPerpetator(ctx context.Context, req getPerpetatorRequest) (r
 func (s service) getConnections(ctx context.Context, req getConnectionsRequest) (res getConnectionsResponse, err error) {
 	cons, err := s.repo.GetConnections(ctx, req.UserID)
 	if err != nil {
-		res.Err = errors.New("failed to fetch connections")
+		res.Err = fmt.Errorf("failed to fetch connections: %w", err)
 		return
 	}
 

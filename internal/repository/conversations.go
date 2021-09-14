@@ -37,7 +37,7 @@ func (r Repository) CreateConversation(ctx context.Context, userID, convUserID s
 }
 
 func (r Repository) GetConversationMessages(ctx context.Context, convID string) (msgs []conversations.Message, err error) {
-	rows, err := r.db.Query(ctx, `SELECT * FROM messages WHERE conv_id=$1`, convID)
+	rows, err := r.db.Query(ctx, `SELECT * FROM messages WHERE conv_id=$1 ORDER BY time_sent`, convID)
 	if err != nil {
 		return
 	}
@@ -58,4 +58,15 @@ func (r Repository) CreateConversationMessage(ctx context.Context, convID, sente
 	err = r.db.QueryRow(ctx, `INSERT INTO messages (conv_id, senter_id, text) VALUES ($1, $2, $3) RETURNING id, time_sent`, convID, senterID, text).Scan(&msgID, &timeSent)
 
 	return
+}
+
+func (r Repository) GetReceiver(ctx context.Context, convID, userID string) (receiverID string, err error) {
+	var us1, us2 string
+	err = r.db.QueryRow(ctx, `SELECT user1_id, user2_id FROM connections WHERE id=$1 AND (user1_id=$2 OR user2_id=$2)`, convID, userID).Scan(&us1, &us2)
+
+	if us1 == userID {
+		return us2, err
+	}
+
+	return us1, err
 }

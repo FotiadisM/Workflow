@@ -31,7 +31,7 @@ type postMessageRequest struct {
 	Text     string `json:"text"`
 }
 type postMessageResponse struct {
-	MesgID   string `json:"mesg_id,omitempty"`
-	TimeSent string `json:"time_sent,omitempty"`
+	MesgID   string `json:"id,omitempty"`
+	TimeSent string `json:"time,omitempty"`
 	Err      error  `json:"err,omitempty"`
 }

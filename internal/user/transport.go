@@ -21,7 +21,7 @@ type getPerpetatorResponse struct {
 }
 
 type getConnectionsRequest struct {
-	UserID string
+	UserID string `json:"user_id"`
 }
 type getConnectionsResponse struct {
 	Connections []Connection `json:"connections,omitempty"`

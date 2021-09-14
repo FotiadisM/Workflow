@@ -1,6 +1,8 @@
 package conversations
 
-import "context"
+import (
+	"context"
+)
 
 type Service interface {
 	getConversations(ctx context.Context, req getConversationsRequest) (res getConversationsResponse, err error)
@@ -10,11 +12,12 @@ type Service interface {
 }
 
 type service struct {
-	repo Repository
+	repo      Repository
+	broadcast chan BroadCastMessage
 }
 
-func NewService(r Repository) Service {
-	return service{repo: r}
+func NewService(r Repository, b chan BroadCastMessage) Service {
+	return service{repo: r, broadcast: b}
 }
 
 func (s service) getConversations(ctx context.Context, req getConversationsRequest) (res getConversationsResponse, err error) {
@@ -62,8 +65,11 @@ func (s service) postMessage(ctx context.Context, req postMessageRequest) (res p
 		return
 	}
 
+	receiverID, err := s.repo.GetReceiver(ctx, req.ConvID, req.SenterID)
+
 	res.MesgID = msgID
 	res.TimeSent = timeSent.String()
+	s.broadcast <- BroadCastMessage{ID: msgID, ConvID: req.ConvID, SenterID: req.SenterID, Receiver: receiverID, Text: req.Text, Time: timeSent}
 
 	return
 }
