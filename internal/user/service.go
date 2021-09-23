@@ -8,10 +8,12 @@ import (
 
 type Service interface {
 	getUser(ctx context.Context, req getUserRequest) (res getUserResponse, err error)
+	getUsers(ctx context.Context, req getUsersRequest) (res getUsersResponse, err error)
 	getPerpetator(ctx context.Context, req getPerpetatorRequest) (res getPerpetatorResponse, err error)
 	getConnections(ctx context.Context, req getConnectionsRequest) (res getConnectionsResponse, err error)
 	postConnection(ctx context.Context, req postConnectionRequest) (res postConnectionResponse, err error)
 	changeConnection(ctx context.Context, req changeConnectionRequest) (res changeConnectionResponse, err error)
+	decideConnectionRequest(ctx context.Context, req decideConnectionRequestRequst) (res decideConnectionRequestResponse, err error)
 }
 
 type service struct {
@@ -30,6 +32,16 @@ func (s service) getUser(ctx context.Context, req getUserRequest) (res getUserRe
 	}
 
 	res.User = &u
+
+	return
+}
+
+func (s service) getUsers(ctx context.Context, req getUsersRequest) (res getUsersResponse, err error) {
+	res.Users, err = s.repo.GetUsers(ctx)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 
 	return
 }
@@ -86,5 +98,9 @@ func (s service) changeConnection(ctx context.Context, req changeConnectionReque
 		res.Err = err
 	}
 
+	return
+}
+
+func (s service) decideConnectionRequest(ctx context.Context, req decideConnectionRequestRequst) (res decideConnectionRequestResponse, err error) {
 	return
 }

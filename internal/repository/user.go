@@ -8,6 +8,24 @@ import (
 	"github.com/jackc/pgx/v4"
 )
 
+func (r Repository) GetUsers(ctx context.Context) (users []user.User, err error) {
+	rows, err := r.db.Query(ctx, ` SELECT * FROM users`)
+	if err != nil {
+		return
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		u := user.User{}
+		if err = rows.Scan(&u.ID, &u.FName, &u.LName, &u.Email, &u.Company, &u.Position, &u.ProfilePic, &u.Role); err != nil {
+			return
+		}
+		users = append(users, u)
+	}
+
+	return
+}
+
 func (r Repository) GetUserByID(ctx context.Context, id string) (u user.User, err error) {
 	err = r.db.QueryRow(ctx, `
 		SELECT

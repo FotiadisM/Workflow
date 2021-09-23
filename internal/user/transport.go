@@ -8,6 +8,13 @@ type getUserResponse struct {
 	Err  error `json:"err,omitempty"`
 }
 
+type getUsersRequest struct {
+}
+type getUsersResponse struct {
+	Users []User `json:"users,omitempty"`
+	Err   error  `json:"err,omitempty"`
+}
+
 type getPerpetatorRequest struct {
 	PerpID string `json:"perp_id"`
 }
@@ -46,3 +53,6 @@ type changeConnectionRequest struct {
 type changeConnectionResponse struct {
 	Err error `json:"err,omitempty"`
 }
+
+type decideConnectionRequestRequst struct{}
+type decideConnectionRequestResponse struct{}

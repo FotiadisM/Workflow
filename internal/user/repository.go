@@ -28,6 +28,7 @@ type Connection struct {
 }
 
 type Repository interface {
+	GetUsers(ctx context.Context) (users []User, err error)
 	GetUserByID(ctx context.Context, id string) (u User, err error)
 	GetPerpetator(ctx context.Context, id string) (u User, err error)
 	GetConnections(ctx context.Context, userID string) (cons []Connection, err error)

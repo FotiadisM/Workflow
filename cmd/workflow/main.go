@@ -129,7 +129,6 @@ func main() {
 					delete(clients, conn)
 					return
 				}
-				// TODO: store message to db
 				// broadcast <- msg
 			}
 		})

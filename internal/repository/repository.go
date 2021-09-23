@@ -87,17 +87,6 @@ func (r Repository) initDatabase(ctx context.Context) (err error) {
 		return
 	}
 
-	// if _, err = r.db.Exec(ctx, `
-	// CREATE TABLE IF NOT EXISTS conversations (
-	// 	id UUID UNIQUE DEFAULT gen_random_uuid(),
-	// 	user1_id UUID REFERENCES public.users(id),
-	// 	user2_id UUID REFERENCES public.users(id),
-
-	// 	CONSTRAINT "primary" PRIMARY KEY (user1_id, user2_id)
-	// );`); err != nil {
-	// 	return
-	// }
-
 	if _, err = r.db.Exec(ctx, `
 	CREATE TABLE IF NOT EXISTS messages (
 		id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
@@ -152,6 +141,20 @@ func (r Repository) initDatabase(ctx context.Context) (err error) {
 		skills STRING[],
 		interested STRING[],
 		applied STRING[],
+		created TIMESTAMP DEFAULT now()
+	);`); err != nil {
+		return
+	}
+
+	// feed
+	// type = "post" | "share" | "comment" | "like"
+	if _, err = r.db.Exec(ctx, `
+	CREATE TABLE IF NOT EXISTS feed (
+		id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+		user_id UUID REFERENCES public.users(id),
+		post_id UUID REFERENCES public.posts(id),
+		perpetrator_id UUID REFERENCES public.users(id),
+		type STRING,
 		created TIMESTAMP DEFAULT now()
 	);`); err != nil {
 		return

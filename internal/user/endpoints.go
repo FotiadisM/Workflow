@@ -7,20 +7,24 @@ import (
 )
 
 type Endpoints struct {
-	getUserEndpoint          endpoint.Endpoint
-	getPerpetatorEndpoint    endpoint.Endpoint
-	getConnectionsEndpoint   endpoint.Endpoint
-	postConnectionEndpoint   endpoint.Endpoint
-	changeConnectionEndpoint endpoint.Endpoint
+	getUserEndpoint                 endpoint.Endpoint
+	getUsersEndpoint                endpoint.Endpoint
+	getPerpetatorEndpoint           endpoint.Endpoint
+	getConnectionsEndpoint          endpoint.Endpoint
+	postConnectionEndpoint          endpoint.Endpoint
+	changeConnectionEndpoint        endpoint.Endpoint
+	decodeConnectionRequestEndpoint endpoint.Endpoint
 }
 
 func NewEndpoints(s Service) Endpoints {
 	return Endpoints{
 		makeGetUserEndpoint(s),
+		makeGetUsersEndpoint(s),
 		makeGetPerpetatorEndpoint(s),
 		makeGetConnectionsEndpoint(s),
 		makePostConnectionsEndpoint(s),
 		makeChangeConnectionsEndpoint(s),
+		makeDecodeConnectionRequestEndpoint(s),
 	}
 }
 
@@ -28,6 +32,15 @@ func makeGetUserEndpoint(s Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
 		req := request.(getUserRequest)
 		res, err := s.getUser(ctx, req)
+
+		return res, err
+	}
+}
+
+func makeGetUsersEndpoint(s Service) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
+		req := request.(getUsersRequest)
+		res, err := s.getUsers(ctx, req)
 
 		return res, err
 	}
@@ -64,6 +77,15 @@ func makeChangeConnectionsEndpoint(s Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
 		req := request.(changeConnectionRequest)
 		res, err := s.changeConnection(ctx, req)
+
+		return res, err
+	}
+}
+
+func makeDecodeConnectionRequestEndpoint(s Service) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
+		req := request.(decideConnectionRequestRequst)
+		res, err := s.decideConnectionRequest(ctx, req)
 
 		return res, err
 	}
