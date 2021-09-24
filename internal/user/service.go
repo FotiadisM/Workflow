@@ -13,6 +13,7 @@ type Service interface {
 	getConnections(ctx context.Context, req getConnectionsRequest) (res getConnectionsResponse, err error)
 	postConnection(ctx context.Context, req postConnectionRequest) (res postConnectionResponse, err error)
 	changeConnection(ctx context.Context, req changeConnectionRequest) (res changeConnectionResponse, err error)
+	getConnectionRequests(ctx context.Context, req getConnectionRequestsRequst) (res getConnectionRequestsResponse, err error)
 	decideConnectionRequest(ctx context.Context, req decideConnectionRequestRequst) (res decideConnectionRequestResponse, err error)
 }
 
@@ -75,9 +76,9 @@ func (s service) getConnections(ctx context.Context, req getConnectionsRequest) 
 }
 
 func (s service) postConnection(ctx context.Context, req postConnectionRequest) (res postConnectionResponse, err error) {
-	id, err := s.repo.CreateConnectionRequest(ctx, req.UserID, req.User2ID)
+	id, err := s.repo.CreateConnectionRequest(ctx, req.UserID, req.ReceiverID)
 	if err != nil {
-		res.Err = errors.New("failed to create connection request")
+		res.Err = fmt.Errorf("failed to create connection request: %w", err)
 		return
 	}
 
@@ -96,6 +97,16 @@ func (s service) changeConnection(ctx context.Context, req changeConnectionReque
 
 	if err != nil {
 		res.Err = err
+	}
+
+	return
+}
+
+func (s service) getConnectionRequests(ctx context.Context, req getConnectionRequestsRequst) (res getConnectionRequestsResponse, err error) {
+	res.Connections, err = s.repo.GetConnectionRequests(ctx, req.UserID)
+	if err != nil {
+		res.Err = err
+		return
 	}
 
 	return

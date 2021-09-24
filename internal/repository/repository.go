@@ -79,10 +79,10 @@ func (r Repository) initDatabase(ctx context.Context) (err error) {
 	if _, err = r.db.Exec(ctx, `
 	CREATE TABLE IF NOT EXISTS connection_requests (
 		id UUID UNIQUE DEFAULT gen_random_uuid(),
-		user1_id UUID REFERENCES public.users(id),
-		user2_id UUID REFERENCES public.users(id),
+		user_id UUID REFERENCES public.users(id),
+		receiver_id UUID REFERENCES public.users(id),
   
-		CONSTRAINT "primary" PRIMARY KEY (user1_id, user2_id)
+		CONSTRAINT "primary" PRIMARY KEY (user_id, receiver_id)
 	);`); err != nil {
 		return
 	}

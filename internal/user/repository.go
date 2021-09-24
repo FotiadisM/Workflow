@@ -33,6 +33,7 @@ type Repository interface {
 	GetPerpetator(ctx context.Context, id string) (u User, err error)
 	GetConnections(ctx context.Context, userID string) (cons []Connection, err error)
 	CreateConnectionRequest(ctx context.Context, userID, user2ID string) (ConnID string, err error)
+	GetConnectionRequests(ctx context.Context, userID string) (cons []Connection, err error)
 	AcceptConnectionRequest(ctx context.Context, ConnID string) (err error)
 	RejectConnectionRequest(ctx context.Context, ConnID string) (err error)
 }

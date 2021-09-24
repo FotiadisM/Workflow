@@ -73,8 +73,26 @@ func (r Repository) GetConnections(ctx context.Context, userID string) (cons []u
 }
 
 func (r Repository) CreateConnectionRequest(ctx context.Context, userID string, user2ID string) (ConnID string, err error) {
-	err = r.db.QueryRow(ctx, `INSEER INTO connection_requests (user1_id, user2_id) VALUES ($1, $2) RETURNING id`, userID, user2ID).Scan(&ConnID)
+	err = r.db.QueryRow(ctx, `INSERT INTO connection_requests (user_id, receiver_id) VALUES ($1, $2) RETURNING id`, userID, user2ID).Scan(&ConnID)
 
+	return
+}
+
+func (r Repository) GetConnectionRequests(ctx context.Context, userID string) (cons []user.Connection, err error) {
+	rows, err := r.db.Query(ctx, ` SELECT id, user_id FROM connection_requests WHERE receiver_id=$1`, userID)
+	if err != nil {
+		return
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		con := user.Connection{}
+		if err = rows.Scan(&con.ConnID, &con.UserID); err != nil {
+			return
+		}
+
+		cons = append(cons, con)
+	}
 	return
 }
 

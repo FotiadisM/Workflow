@@ -13,7 +13,8 @@ type Endpoints struct {
 	getConnectionsEndpoint          endpoint.Endpoint
 	postConnectionEndpoint          endpoint.Endpoint
 	changeConnectionEndpoint        endpoint.Endpoint
-	decodeConnectionRequestEndpoint endpoint.Endpoint
+	getConnectionRequestsEndpoint   endpoint.Endpoint
+	decideConnectionRequestEndpoint endpoint.Endpoint
 }
 
 func NewEndpoints(s Service) Endpoints {
@@ -24,7 +25,8 @@ func NewEndpoints(s Service) Endpoints {
 		makeGetConnectionsEndpoint(s),
 		makePostConnectionsEndpoint(s),
 		makeChangeConnectionsEndpoint(s),
-		makeDecodeConnectionRequestEndpoint(s),
+		makeGetConnectionRequestsEndpoint(s),
+		makeDecideConnectionRequestEndpoint(s),
 	}
 }
 
@@ -82,7 +84,16 @@ func makeChangeConnectionsEndpoint(s Service) endpoint.Endpoint {
 	}
 }
 
-func makeDecodeConnectionRequestEndpoint(s Service) endpoint.Endpoint {
+func makeGetConnectionRequestsEndpoint(s Service) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
+		req := request.(getConnectionRequestsRequst)
+		res, err := s.getConnectionRequests(ctx, req)
+
+		return res, err
+	}
+}
+
+func makeDecideConnectionRequestEndpoint(s Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
 		req := request.(decideConnectionRequestRequst)
 		res, err := s.decideConnectionRequest(ctx, req)

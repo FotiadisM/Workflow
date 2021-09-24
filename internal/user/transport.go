@@ -36,8 +36,8 @@ type getConnectionsResponse struct {
 }
 
 type postConnectionRequest struct {
-	UserID  string `json:"user_id"`
-	User2ID string `json:"user_2_id"`
+	UserID     string `json:"user_id"`
+	ReceiverID string `json:"receiver_id"`
 }
 type postConnectionResponse struct {
 	ConnID string `json:"conn_id,omitempty"`
@@ -52,6 +52,14 @@ type changeConnectionRequest struct {
 }
 type changeConnectionResponse struct {
 	Err error `json:"err,omitempty"`
+}
+
+type getConnectionRequestsRequst struct {
+	UserID string `json:"user_id"`
+}
+type getConnectionRequestsResponse struct {
+	Connections []Connection `json:"connections,omitempty"`
+	Err         error        `json:"err,omitempty"`
 }
 
 type decideConnectionRequestRequst struct{}

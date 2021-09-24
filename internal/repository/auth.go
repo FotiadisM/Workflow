@@ -40,6 +40,6 @@ func (r Repository) CreateUser(ctx context.Context, fName, lName, email, company
 }
 
 func (r Repository) GetUserByEmail(ctx context.Context, email string) (u user.User, err error) {
-	err = r.db.QueryRow(ctx, `SELECT * FROM users WHERE email=$1`, email).Scan(&u.ID, &u.FName, &u.LName, &u.Email, &u.Company, &u.Position, &u.Role)
+	err = r.db.QueryRow(ctx, `SELECT * FROM users WHERE email=$1`, email).Scan(&u.ID, &u.FName, &u.LName, &u.Email, &u.Company, &u.Position, &u.ProfilePic, &u.Role)
 	return
 }

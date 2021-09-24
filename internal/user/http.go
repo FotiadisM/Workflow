@@ -2,6 +2,7 @@ package user
 
 import (
 	"context"
+	"encoding/json"
 	"net/http"
 
 	httptransport "github.com/go-kit/kit/transport/http"
@@ -52,9 +53,16 @@ func NewHTTPHandler(e Endpoints, r *mux.Router, options ...httptransport.ServerO
 		options...,
 	))
 
+	r.Methods("GET").Path("/connectionRequests/{id}").Handler(httptransport.NewServer(
+		e.getConnectionRequestsEndpoint,
+		decodeGetConnectionsRequest,
+		httptransport.EncodeJSONResponse,
+		options...,
+	))
+
 	r.Methods("PUT").Path("/connectionRequests").Handler(httptransport.NewServer(
-		e.decodeConnectionRequestEndpoint,
-		decodeDecideConnectionRequest,
+		e.decideConnectionRequestEndpoint,
+		decodeGetConnectionsRequests,
 		httptransport.EncodeJSONResponse,
 		options...,
 	))
@@ -80,15 +88,24 @@ func decodeGetPerpetatorRequest(ctx context.Context, r *http.Request) (request i
 func decodeGetConnectionsRequest(ctx context.Context, r *http.Request) (request interface{}, err error) {
 	vars := mux.Vars(r)
 	id := vars["id"]
-	return getConnectionsRequest{UserID: id}, nil
+	return getConnectionRequestsRequst{UserID: id}, nil
 }
 
 func decodePostConnectionRequest(ctx context.Context, r *http.Request) (request interface{}, err error) {
-	return
+	var res postConnectionRequest
+	err = json.NewDecoder(r.Body).Decode(&res)
+
+	return res, err
 }
 
 func decodeChangeConnectionRequest(ctx context.Context, r *http.Request) (request interface{}, err error) {
 	return
+}
+
+func decodeGetConnectionsRequests(ctx context.Context, r *http.Request) (request interface{}, err error) {
+	vars := mux.Vars(r)
+	id := vars["id"]
+	return getConnectionRequestsRequst{UserID: id}, nil
 }
 
 func decodeDecideConnectionRequest(ctx context.Context, r *http.Request) (request interface{}, err error) {
