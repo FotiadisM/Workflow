@@ -42,6 +42,7 @@ func (s service) signIn(ctx context.Context, req signInRequest) (res signInRespo
 	res.User.Email = u.Email
 	res.User.Company = u.Company
 	res.User.Position = u.Position
+	res.User.ProfilePic = u.ProfilePic
 	res.User.Role = u.Role
 
 	return
