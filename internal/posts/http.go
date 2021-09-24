@@ -18,7 +18,7 @@ func NewHTTPRouter(e Endpoints, r *mux.Router, options ...httptransport.ServerOp
 		options...,
 	))
 
-	r.Methods("POST").Path("/like/").Handler(httptransport.NewServer(
+	r.Methods("POST").Path("/like").Handler(httptransport.NewServer(
 		e.togglePostLikeEndpoint,
 		decodeTogglePostLikeRequest,
 		httptransport.EncodeJSONResponse,

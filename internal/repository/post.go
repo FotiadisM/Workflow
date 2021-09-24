@@ -34,7 +34,38 @@ func (r Repository) GetPost(ctx context.Context, postID string) (p *posts.Post, 
 }
 
 func (r Repository) TogglePostLike(ctx context.Context, postID, userID string) (err error) {
-	panic("not implemented")
+	indx := []int{}
+	err = r.db.QueryRow(ctx, `
+	SELECT
+		array_positions(likes, $1)
+	FROM
+		posts
+	WHERE
+		id=$2
+	;`, userID, postID).Scan(&indx)
+	if err != nil {
+		return
+	}
+
+	if len(indx) == 0 {
+		// append interested
+		_, err = r.db.Exec(ctx, `
+		UPDATE posts SET
+			likes = array_append(likes, $1)
+		WHERE
+			id = $2
+		;`, userID, postID)
+	} else {
+		// remove interested
+		_, err = r.db.Exec(ctx, `
+		UPDATE posts SET
+			likes = array_remove(likes, $1)
+		WHERE
+			id = $2
+		;`, userID, postID)
+	}
+
+	return
 }
 
 func (r Repository) CreatePostComment(ctx context.Context, postID, userID, text string) (id string, created time.Time, err error) {
