@@ -35,7 +35,16 @@ type Comment struct {
 	Created string   `json:"created"`
 }
 
+type Feed struct {
+	ID            string `json:"id"`
+	UserID        string `json:"user_id"`
+	PostID        string `json:"post_id"`
+	PerpetratorID string `json:"perpetator_id"`
+	FeedType      string `json:"type"`
+}
+
 type Repository interface {
+	getFeed(ctx context.Context, userID string) (fs []Feed, err error)
 	CreatePost(ctx context.Context, userID, text, visivility string, images, videos []string) (id string, created time.Time, err error)
 	GetPost(ctx context.Context, postID string) (p *Post, err error)
 	GetUserPosts(ctx context.Context, userID, FromUserID string) (posts []Post, err error)

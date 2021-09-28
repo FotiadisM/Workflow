@@ -10,6 +10,13 @@ type getPostsResponse struct {
 	Err  error `json:"err,omitempty"`
 }
 
+type getFeedsRequest struct {
+	UserID string `json:"user_id"`
+}
+type getFeedsResponse struct {
+	Err error `json:"err,omitempty"`
+}
+
 type getUserPostsRequest struct {
 	UserID     string `json:"user_id"`
 	FromUserID string `json:"from_user_id"`
