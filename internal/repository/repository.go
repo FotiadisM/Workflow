@@ -3,8 +3,10 @@ package repository
 import (
 	"context"
 	"errors"
+	"math/rand"
 	"time"
 
+	"github.com/FotiadisM/workflow-server/internal/posts"
 	"github.com/jackc/pgx/v4/pgxpool"
 )
 
@@ -23,20 +25,20 @@ func NewRepository(ctx context.Context, dbURL string) (r Repository, err error) 
 		return
 	}
 
-	ctx1, cncl1 := context.WithTimeout(ctx, 2*time.Second)
-	defer cncl1()
-
-	pool, err := pgxpool.ConnectConfig(ctx1, config)
+	pool, err := pgxpool.ConnectConfig(ctx, config)
 	if err != nil {
 		return
 	}
 	r.db = pool
 
-	ctx2, cncl2 := context.WithTimeout(ctx, 2*time.Second)
-	defer cncl2()
-	if err = r.initDatabase(ctx2); err != nil {
+	if err = r.initDatabase(ctx); err != nil {
 		return
 	}
+
+	// err = r.populateDB(ctx)
+	// if err != nil {
+	// 	return r, fmt.Errorf("Failed to populate db: %w", err)
+	// }
 
 	return
 }
@@ -161,4 +163,144 @@ func (r Repository) initDatabase(ctx context.Context) (err error) {
 	}
 
 	return
+}
+
+func (r Repository) populateDB(ctx context.Context) (err error) {
+	// USERS
+
+	// 	f, err := os.Open("./mock-data/user_mock_data.csv")
+	// 	if err != nil {
+	// 		fmt.Println(err)
+	// 		return
+	// 	}
+	// 	defer f.Close()
+
+	// 	autSvc := auth.NewService(r)
+
+	// 	cr := csv.NewReader(f)
+	// 	var record []string
+	// 	for {
+	// 		record, err = cr.Read()
+	// 		if record == nil {
+	// 			break
+	// 		}
+
+	// 		req := auth.SignUpRequest{
+	// 			FName:      record[0],
+	// 			LName:      record[1],
+	// 			Email:      record[2],
+	// 			Company:    record[3],
+	// 			Position:   record[4],
+	// 			Password:   "1234",
+	// 			ProfilePic: nil,
+	// 		}
+	// 		res, err := autSvc.SignUp(ctx, req)
+	// 		if err != nil {
+	// 			return err
+	// 		}
+	// 		fmt.Println(res.User.ID)
+
+	// 	}
+	// 	if err != nil {
+	// 		if !errors.Is(err, io.EOF) {
+	// 			return
+	// 		}
+	// 	}
+
+	// POSTS
+
+	s1 := rand.NewSource(time.Now().UnixNano())
+	r1 := rand.New(s1)
+
+	rows, err := r.db.Query(ctx, `SELECT id FROM users`)
+	if err != nil {
+		return
+	}
+	defer rows.Close()
+
+	userIDs := []string{}
+	for rows.Next() {
+		var id string
+		err = rows.Scan(&id)
+		if err != nil {
+			return
+		}
+		userIDs = append(userIDs, id)
+	}
+
+	postsSvc := posts.NewService(r)
+
+	// 	f, err := os.Open("./mock-data/text_mock_data.csv")
+	// 	if err != nil {
+	// 		fmt.Println(err)
+	// 		return
+	// 	}
+	// 	defer f.Close()
+
+	// 	cr := csv.NewReader(f)
+	// 	var record []string
+	// 	for {
+	// 		record, err = cr.Read()
+	// 		if record == nil {
+	// 			break
+	// 		}
+
+	// 		rID := r1.Int() % len(ids)
+	// 		req := posts.CreatePostRequest{
+	// 			UserID:     ids[rID],
+	// 			Text:       record[0],
+	// 			Images:     []io.ReadCloser{},
+	// 			Videos:     []io.ReadCloser{},
+	// 			Visibility: posts.All,
+	// 		}
+
+	// 		rID = r1.Int() % 10
+	// 		if rID == 0 {
+	// 			req.Visibility = posts.Friends
+	// 		}
+	// 		_, err := postsSvc.CreatePost(ctx, req)
+	// 		if err != nil {
+	// 			return err
+	// 		}
+	// 	}
+	// 	if err != nil {
+	// 		if !errors.Is(err, io.EOF) {
+	// 			return
+	// 		}
+	// 	}
+
+	// LIKES
+
+	rows, err = r.db.Query(ctx, `SELECT id FROM posts`)
+	if err != nil {
+		return
+	}
+	defer rows.Close()
+
+	postsIDs := []string{}
+	for rows.Next() {
+		var id string
+		err = rows.Scan(&id)
+		if err != nil {
+			return
+		}
+		postsIDs = append(postsIDs, id)
+	}
+
+	for index := range postsIDs {
+		likesCount := r1.Int() % 250
+		for i := 0; i < likesCount; i++ {
+			id := r1.Int() % len(userIDs)
+			req := posts.TogglePostLikeRequest{
+				UserID: userIDs[id],
+				PostID: postsIDs[index],
+			}
+			_, err = postsSvc.TogglePostLike(ctx, req)
+			if err != nil {
+				return
+			}
+		}
+	}
+
+	return nil
 }

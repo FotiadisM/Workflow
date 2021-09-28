@@ -17,7 +17,7 @@ type signInResponse struct {
 	User         user.User `json:"user"`
 }
 
-type signUpRequest struct {
+type SignUpRequest struct {
 	FName      string `json:"f_name"`
 	LName      string `json:"l_name"`
 	Email      string `json:"email"`
@@ -27,7 +27,7 @@ type signUpRequest struct {
 	ProfilePic io.Reader
 }
 
-type signUpResponse struct {
+type SignUpResponse struct {
 	AccessToken  string    `json:"access_token"`
 	RefressToken string    `json:"refress_token"`
 	User         user.User `json:"user"`

@@ -8,6 +8,7 @@ import (
 
 type Endpoints struct {
 	getPostsEndpoint          endpoint.Endpoint
+	getUserPostsEndpoint      endpoint.Endpoint
 	createPostsEndpoint       endpoint.Endpoint
 	getPostCommentEndpoint    endpoint.Endpoint
 	createPostCommentEndpoint endpoint.Endpoint
@@ -18,6 +19,7 @@ type Endpoints struct {
 func NewEndpoints(s Service) Endpoints {
 	return Endpoints{
 		makeGetPostEndpoint(s),
+		makeGetUserPostsEndpoint(s),
 		makeCreatePostEndpoint(s),
 		makeGetPostCommentEndpoint(s),
 		makeCreatePostCommentEndpoint(s),
@@ -35,10 +37,19 @@ func makeGetPostEndpoint(s Service) endpoint.Endpoint {
 	}
 }
 
+func makeGetUserPostsEndpoint(s Service) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
+		req := request.(getUserPostsRequest)
+		res, err := s.getUserPosts(ctx, req)
+
+		return res, err
+	}
+}
+
 func makeCreatePostEndpoint(s Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
-		req := request.(createPostRequest)
-		res, err := s.createPost(ctx, req)
+		req := request.(CreatePostRequest)
+		res, err := s.CreatePost(ctx, req)
 
 		return res, err
 	}
@@ -64,8 +75,8 @@ func makeCreatePostCommentEndpoint(s Service) endpoint.Endpoint {
 
 func makeTogglePostLikeEndpoint(s Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
-		req := request.(togglePostLikeRequest)
-		res, err := s.togglePostLike(ctx, req)
+		req := request.(TogglePostLikeRequest)
+		res, err := s.TogglePostLike(ctx, req)
 
 		return res, err
 	}

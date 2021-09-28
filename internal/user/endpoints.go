@@ -33,7 +33,7 @@ func NewEndpoints(s Service) Endpoints {
 func makeGetUserEndpoint(s Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
 		req := request.(getUserRequest)
-		res, err := s.getUser(ctx, req)
+		res, err := s.GetUser(ctx, req)
 
 		return res, err
 	}

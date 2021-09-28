@@ -38,6 +38,7 @@ type Comment struct {
 type Repository interface {
 	CreatePost(ctx context.Context, userID, text, visivility string, images, videos []string) (id string, created time.Time, err error)
 	GetPost(ctx context.Context, postID string) (p *Post, err error)
+	GetUserPosts(ctx context.Context, userID, FromUserID string) (posts []Post, err error)
 	TogglePostLike(ctx context.Context, postID, userID string) (err error)
 	CreatePostComment(ctx context.Context, postID, userID, text string) (id string, created time.Time, err error)
 	GetPostComment(ctx context.Context, postID string) (c *Comment, err error)

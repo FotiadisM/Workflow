@@ -52,6 +52,13 @@ func NewHTTPRouter(e Endpoints, r *mux.Router, options ...httptransport.ServerOp
 		httptransport.EncodeJSONResponse,
 		options...,
 	))
+
+	r.Methods("POST").Path("/user").Handler(httptransport.NewServer(
+		e.getUserPostsEndpoint,
+		decodeGetUserPostsRequest,
+		httptransport.EncodeJSONResponse,
+		options...,
+	))
 }
 
 func decodeGetPostRequest(ctx context.Context, r *http.Request) (request interface{}, err error) {
@@ -62,7 +69,7 @@ func decodeGetPostRequest(ctx context.Context, r *http.Request) (request interfa
 }
 
 func decodeCreatePostRequest(ctx context.Context, r *http.Request) (request interface{}, err error) {
-	var req createPostRequest
+	var req CreatePostRequest
 	err = r.ParseMultipartForm(32 << 22)
 	if err != nil {
 		return
@@ -98,7 +105,7 @@ func decodeCreatePostRequest(ctx context.Context, r *http.Request) (request inte
 }
 
 func decodeTogglePostLikeRequest(ctx context.Context, r *http.Request) (request interface{}, err error) {
-	var req togglePostLikeRequest
+	var req TogglePostLikeRequest
 	err = json.NewDecoder(r.Body).Decode(&req)
 	return req, err
 }
@@ -118,6 +125,12 @@ func decodeCreatePostCommentRequest(ctx context.Context, r *http.Request) (reque
 
 func decodeToggleCommentLikeRequest(ctx context.Context, r *http.Request) (request interface{}, err error) {
 	var req toggleCommentLikeRequest
+	err = json.NewDecoder(r.Body).Decode(&req)
+	return req, err
+}
+
+func decodeGetUserPostsRequest(ctx context.Context, r *http.Request) (request interface{}, err error) {
+	var req getUserPostsRequest
 	err = json.NewDecoder(r.Body).Decode(&req)
 	return req, err
 }

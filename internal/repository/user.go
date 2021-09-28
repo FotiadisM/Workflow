@@ -96,15 +96,15 @@ func (r Repository) GetConnectionRequests(ctx context.Context, userID string) (c
 	return
 }
 
-func (r Repository) AcceptConnectionRequest(ctx context.Context, ConnID string) (err error) {
+func (r Repository) AcceptConnectionRequest(ctx context.Context, ConnID string) (newConnID string, err error) {
 	err = crdbpgx.ExecuteTx(ctx, r.db, pgx.TxOptions{}, func(tx pgx.Tx) error {
 		var id, user1ID, user2ID string
-		err := tx.QueryRow(ctx, `DELETE FROM connection_requests WHERE id=$1 RETURNING id, user1_id, user2_id`).Scan(&id, &user1ID, &user2ID)
+		err := tx.QueryRow(ctx, `DELETE FROM connection_requests WHERE id=$1 RETURNING id, user_id, receiver_id`).Scan(&id, &user1ID, &user2ID)
 		if err != nil {
 			return err
 		}
 
-		_, err = tx.Exec(ctx, `INSERT INTO connections VALUES ($1, $2, $3)`, id, user1ID, user2ID)
+		err = tx.QueryRow(ctx, `INSERT INTO connections VALUES ($1, $2, $3) RETURNING id`, id, user1ID, user2ID).Scan(&newConnID)
 		if err != nil {
 			return err
 		}

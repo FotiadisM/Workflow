@@ -6,12 +6,13 @@ import (
 
 type Service interface {
 	getPost(ctx context.Context, req getPostsRequest) (res getPostsResponse, err error)
-	createPost(ctx context.Context, req createPostRequest) (res createPostResponse, err error)
+	getUserPosts(ctx context.Context, req getUserPostsRequest) (res getUserPostsResponse, err error)
+	CreatePost(ctx context.Context, req CreatePostRequest) (res CreatePostResponse, err error)
 
 	getPostComment(ctx context.Context, req getPostCommentRequest) (res getPostCommentResponse, err error)
 	createPostComment(ctx context.Context, req createPostCommentRequest) (res createPostCommentResponse, err error)
 
-	togglePostLike(ctx context.Context, req togglePostLikeRequest) (res togglePostLikeResponse, err error)
+	TogglePostLike(ctx context.Context, req TogglePostLikeRequest) (res TogglePostLikeResponse, err error)
 	toggleCommentLike(ctx context.Context, req toggleCommentLikeRequest) (res toggleCommentLikeResponse, err error)
 }
 
@@ -34,7 +35,17 @@ func (s service) getPost(ctx context.Context, req getPostsRequest) (res getPosts
 	return
 }
 
-func (s service) createPost(ctx context.Context, req createPostRequest) (res createPostResponse, err error) {
+func (s service) getUserPosts(ctx context.Context, req getUserPostsRequest) (res getUserPostsResponse, err error) {
+	ps, err := s.repo.GetUserPosts(ctx, req.UserID, req.FromUserID)
+	if err != nil {
+		res.Err = err
+		return
+	}
+	res.Posts = ps
+	return
+}
+
+func (s service) CreatePost(ctx context.Context, req CreatePostRequest) (res CreatePostResponse, err error) {
 	images := []string{}
 	videos := []string{}
 
@@ -101,7 +112,7 @@ func (s service) createPostComment(ctx context.Context, req createPostCommentReq
 	return res, nil
 }
 
-func (s service) togglePostLike(ctx context.Context, req togglePostLikeRequest) (res togglePostLikeResponse, err error) {
+func (s service) TogglePostLike(ctx context.Context, req TogglePostLikeRequest) (res TogglePostLikeResponse, err error) {
 	err = s.repo.TogglePostLike(ctx, req.PostID, req.UserID)
 	if err != nil {
 		res.Err = err

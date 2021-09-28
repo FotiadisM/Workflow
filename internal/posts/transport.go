@@ -10,14 +10,23 @@ type getPostsResponse struct {
 	Err  error `json:"err,omitempty"`
 }
 
-type createPostRequest struct {
+type getUserPostsRequest struct {
+	UserID     string `json:"user_id"`
+	FromUserID string `json:"from_user_id"`
+}
+type getUserPostsResponse struct {
+	Posts []Post `json:"posts,omitempty"`
+	Err   error  `json:"err,omitempty"`
+}
+
+type CreatePostRequest struct {
 	UserID     string
 	Text       string
 	Images     []io.ReadCloser
 	Videos     []io.ReadCloser
 	Visibility PostVisibility
 }
-type createPostResponse struct {
+type CreatePostResponse struct {
 	Post *Post `json:"post,omitempty"`
 	Err  error `json:"err,omitempty"`
 }
@@ -40,11 +49,11 @@ type createPostCommentResponse struct {
 	Err     error    `json:"err,omitempty"`
 }
 
-type togglePostLikeRequest struct {
+type TogglePostLikeRequest struct {
 	UserID string `json:"user_id"`
 	PostID string `json:"post_id"`
 }
-type togglePostLikeResponse struct {
+type TogglePostLikeResponse struct {
 	Err error `json:"err,omitempty"`
 }
 

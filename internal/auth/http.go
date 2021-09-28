@@ -34,7 +34,7 @@ func decodeSignInRequest(ctx context.Context, r *http.Request) (request interfac
 }
 
 func decodeSignUpRequest(ctx context.Context, r *http.Request) (request interface{}, err error) {
-	var req signUpRequest
+	var req SignUpRequest
 	err = r.ParseMultipartForm(32 << 20)
 	if err != nil {
 		return

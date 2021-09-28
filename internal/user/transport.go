@@ -62,5 +62,11 @@ type getConnectionRequestsResponse struct {
 	Err         error        `json:"err,omitempty"`
 }
 
-type decideConnectionRequestRequst struct{}
-type decideConnectionRequestResponse struct{}
+type decideConnectionRequestRequst struct {
+	ConnID string `json:"conn_id"`
+	Accept bool   `json:"accept"`
+}
+type decideConnectionRequestResponse struct {
+	ConnID string `json:"conn_id,omitempty"`
+	Err    error  `json:"err,omitempty"`
+}

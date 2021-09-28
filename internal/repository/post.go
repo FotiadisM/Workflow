@@ -22,6 +22,72 @@ func (r Repository) CreatePost(ctx context.Context, userID, text, visibility str
 	return
 }
 
+func (r Repository) GetUserPosts(ctx context.Context, userID, fromUserID string) (ps []posts.Post, err error) {
+	var rows pgx.Rows
+	if userID == fromUserID {
+		rows, err = r.db.Query(ctx, ` SELECT * FROM posts WHERE user_id=$1`, userID)
+		if err != nil {
+			return nil, err
+		}
+		defer rows.Close()
+
+		var t time.Time
+		for rows.Next() {
+			p := posts.Post{}
+			if err = rows.Scan(&(p.ID), &(p.UserID), &(p.Text), &(p.Images), &(p.Videos), &(p.Visivility), &(p.Likes), &(p.Comments), &t); err != nil {
+				return nil, err
+			}
+			p.Created = t.Format("1/2 15:04")
+			ps = append(ps, p)
+		}
+
+		return ps, nil
+	}
+
+	var fr int
+	if fromUserID != "" {
+		err = r.db.QueryRow(ctx, `
+		SELECT
+			COUNT(id)
+		FROM
+			connections
+		WHERE
+			(user1_id=$1 AND user2_id=$2)
+			OR
+			(user1_id=$2 AND user2_id=$1)
+	`, userID, fromUserID).Scan(&fr)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		fr = 0
+	}
+
+	if fr == 1 {
+		rows, err = r.db.Query(ctx, ` SELECT * FROM posts WHERE user_id=$1 AND (visibility='friends' OR visibility='all')`, userID)
+		defer rows.Close()
+	} else {
+		rows, err = r.db.Query(ctx, ` SELECT * FROM posts WHERE user_id=$1 AND visibility='all'`, userID)
+		defer rows.Close()
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	var t time.Time
+	for rows.Next() {
+		p := posts.Post{}
+		if err = rows.Scan(&(p.ID), &(p.UserID), &(p.Text), &(p.Images), &(p.Videos), &(p.Visivility), &(p.Likes), &(p.Comments), &t); err != nil {
+			return nil, err
+		}
+		p.Created = t.Format("1/2 15:04")
+		ps = append(ps, p)
+	}
+
+	return
+}
+
 func (r Repository) GetPost(ctx context.Context, postID string) (p *posts.Post, err error) {
 	var t time.Time
 	p = &posts.Post{}

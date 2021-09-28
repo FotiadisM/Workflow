@@ -99,7 +99,7 @@ func decodePostConnectionRequest(ctx context.Context, r *http.Request) (request 
 }
 
 func decodeChangeConnectionRequest(ctx context.Context, r *http.Request) (request interface{}, err error) {
-	return
+	panic("not implemented yet")
 }
 
 func decodeGetConnectionRequestsRequest(ctx context.Context, r *http.Request) (request interface{}, err error) {
@@ -109,5 +109,7 @@ func decodeGetConnectionRequestsRequest(ctx context.Context, r *http.Request) (r
 }
 
 func decodeDecideConnectionRequest(ctx context.Context, r *http.Request) (request interface{}, err error) {
-	return
+	var req decideConnectionRequestRequst
+	err = json.NewDecoder(r.Body).Decode(&req)
+	return req, err
 }

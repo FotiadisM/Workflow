@@ -7,7 +7,7 @@ import (
 )
 
 type Service interface {
-	getUser(ctx context.Context, req getUserRequest) (res getUserResponse, err error)
+	GetUser(ctx context.Context, req getUserRequest) (res getUserResponse, err error)
 	getUsers(ctx context.Context, req getUsersRequest) (res getUsersResponse, err error)
 	getPerpetator(ctx context.Context, req getPerpetatorRequest) (res getPerpetatorResponse, err error)
 	getConnections(ctx context.Context, req getConnectionsRequest) (res getConnectionsResponse, err error)
@@ -25,7 +25,7 @@ func NewService(r Repository) Service {
 	return service{r}
 }
 
-func (s service) getUser(ctx context.Context, req getUserRequest) (res getUserResponse, err error) {
+func (s service) GetUser(ctx context.Context, req getUserRequest) (res getUserResponse, err error) {
 	u, err := s.repo.GetUserByID(ctx, req.UserID)
 	if err != nil {
 		res.Err = err
@@ -88,18 +88,8 @@ func (s service) postConnection(ctx context.Context, req postConnectionRequest) 
 }
 
 func (s service) changeConnection(ctx context.Context, req changeConnectionRequest) (res changeConnectionResponse, err error) {
-
-	if req.Accept {
-		err = s.repo.AcceptConnectionRequest(ctx, req.ConnID)
-	} else {
-		err = s.repo.RejectConnectionRequest(ctx, req.ConnID)
-	}
-
-	if err != nil {
-		res.Err = err
-	}
-
-	return
+	// TODO: implement delete connection
+	panic("not implemented")
 }
 
 func (s service) getConnectionRequests(ctx context.Context, req getConnectionRequestsRequst) (res getConnectionRequestsResponse, err error) {
@@ -113,5 +103,18 @@ func (s service) getConnectionRequests(ctx context.Context, req getConnectionReq
 }
 
 func (s service) decideConnectionRequest(ctx context.Context, req decideConnectionRequestRequst) (res decideConnectionRequestResponse, err error) {
+	var conID string
+	if req.Accept {
+		conID, err = s.repo.AcceptConnectionRequest(ctx, req.ConnID)
+	} else {
+		err = s.repo.RejectConnectionRequest(ctx, req.ConnID)
+	}
+	if err != nil {
+		res.Err = err
+		return
+	}
+
+	res.ConnID = conID
+
 	return
 }

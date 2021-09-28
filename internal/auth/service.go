@@ -10,7 +10,7 @@ import (
 
 type Service interface {
 	signIn(ctx context.Context, req signInRequest) (res signInResponse, err error)
-	signUp(ctx context.Context, req signUpRequest) (res signUpResponse, err error)
+	SignUp(ctx context.Context, req SignUpRequest) (res SignUpResponse, err error)
 }
 
 type service struct {
@@ -48,15 +48,18 @@ func (s service) signIn(ctx context.Context, req signInRequest) (res signInRespo
 	return
 }
 
-func (s service) signUp(ctx context.Context, req signUpRequest) (res signUpResponse, err error) {
+func (s service) SignUp(ctx context.Context, req SignUpRequest) (res SignUpResponse, err error) {
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return
 	}
 
-	fileID, err := s.repo.PostFile(ctx, req.ProfilePic)
-	if err != nil {
-		return
+	fileID := ""
+	if req.ProfilePic != nil {
+		fileID, err = s.repo.PostFile(ctx, req.ProfilePic)
+		if err != nil {
+			return
+		}
 	}
 
 	fName := strings.Title(req.FName)

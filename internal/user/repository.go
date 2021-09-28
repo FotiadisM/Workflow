@@ -34,6 +34,6 @@ type Repository interface {
 	GetConnections(ctx context.Context, userID string) (cons []Connection, err error)
 	CreateConnectionRequest(ctx context.Context, userID, user2ID string) (ConnID string, err error)
 	GetConnectionRequests(ctx context.Context, userID string) (cons []Connection, err error)
-	AcceptConnectionRequest(ctx context.Context, ConnID string) (err error)
-	RejectConnectionRequest(ctx context.Context, ConnID string) (err error)
+	AcceptConnectionRequest(ctx context.Context, connID string) (newConnID string, err error)
+	RejectConnectionRequest(ctx context.Context, connID string) (err error)
 }
