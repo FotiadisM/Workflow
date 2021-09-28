@@ -59,12 +59,26 @@ func NewHTTPRouter(e Endpoints, r *mux.Router, options ...httptransport.ServerOp
 		httptransport.EncodeJSONResponse,
 		options...,
 	))
+
+	r.Methods("GET").Path("/feed/{id}").Handler(httptransport.NewServer(
+		e.getFeedsEndpoint,
+		decodeGetFeedRequest,
+		httptransport.EncodeJSONResponse,
+		options...,
+	))
 }
 
 func decodeGetPostRequest(ctx context.Context, r *http.Request) (request interface{}, err error) {
 	var req getPostsRequest
 	vars := mux.Vars(r)
 	req.PostID = vars["id"]
+	return req, err
+}
+
+func decodeGetFeedRequest(ctx context.Context, r *http.Request) (request interface{}, err error) {
+	var req getFeedsRequest
+	vars := mux.Vars(r)
+	req.UserID = vars["id"]
 	return req, err
 }
 

@@ -7,6 +7,7 @@ import (
 )
 
 type Endpoints struct {
+	getFeedsEndpoint          endpoint.Endpoint
 	getPostsEndpoint          endpoint.Endpoint
 	getUserPostsEndpoint      endpoint.Endpoint
 	createPostsEndpoint       endpoint.Endpoint
@@ -18,6 +19,7 @@ type Endpoints struct {
 
 func NewEndpoints(s Service) Endpoints {
 	return Endpoints{
+		makeGetFeedEndpoint(s),
 		makeGetPostEndpoint(s),
 		makeGetUserPostsEndpoint(s),
 		makeCreatePostEndpoint(s),
@@ -25,6 +27,15 @@ func NewEndpoints(s Service) Endpoints {
 		makeCreatePostCommentEndpoint(s),
 		makeTogglePostLikeEndpoint(s),
 		makeToggleCommentLikeEndpoint(s),
+	}
+}
+
+func makeGetFeedEndpoint(s Service) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
+		req := request.(getFeedsRequest)
+		res, err := s.getFeed(ctx, req)
+
+		return res, err
 	}
 }
 

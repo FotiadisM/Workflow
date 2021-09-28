@@ -16,4 +16,5 @@ require (
 	github.com/lib/pq v1.10.1 // indirect
 	golang.org/x/crypto v0.0.0-20210505212654-3497b51f5e64
 	golang.org/x/text v0.3.6 // indirect
+	gonum.org/v1/gonum v0.9.3
 )

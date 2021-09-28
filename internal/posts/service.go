@@ -6,6 +6,7 @@ import (
 
 type Service interface {
 	getPost(ctx context.Context, req getPostsRequest) (res getPostsResponse, err error)
+	getFeed(ctx context.Context, req getFeedsRequest) (res getFeedsResponse, err error)
 	getUserPosts(ctx context.Context, req getUserPostsRequest) (res getUserPostsResponse, err error)
 	CreatePost(ctx context.Context, req CreatePostRequest) (res CreatePostResponse, err error)
 
@@ -32,6 +33,10 @@ func (s service) getPost(ctx context.Context, req getPostsRequest) (res getPosts
 	}
 
 	res.Post = p
+	return
+}
+
+func (s service) getFeed(ctx context.Context, req getFeedsRequest) (res getFeedsResponse, err error) {
 	return
 }
 
