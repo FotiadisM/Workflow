@@ -148,6 +148,30 @@ func (r Repository) initDatabase(ctx context.Context) (err error) {
 		return
 	}
 
+	// experience
+	if _, err = r.db.Exec(ctx, `
+	CREATE TABLE IF NOT EXISTS experience (
+		id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+		user_id UUID REFERENCES public.users(id),
+		time_from STRING,
+		time_to STRING,
+		company STRING,
+		position STRING
+	);`); err != nil {
+		return
+	}
+
+	// education
+	if _, err = r.db.Exec(ctx, `
+	CREATE TABLE IF NOT EXISTS education (
+		id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+		user_id UUID REFERENCES public.users(id),
+		time STRING,
+		title STRING
+	);`); err != nil {
+		return
+	}
+
 	// feed
 	// type = "post" | "share" | "comment" | "like"
 	if _, err = r.db.Exec(ctx, `
