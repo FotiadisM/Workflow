@@ -252,7 +252,7 @@ func (r Repository) populateDB(ctx context.Context) (err error) {
 		userIDs = append(userIDs, id)
 	}
 
-	postsSvc := posts.NewService(r)
+	postsSvc := posts.NewService(r, nil)
 
 	// 	f, err := os.Open("./mock-data/text_mock_data.csv")
 	// 	if err != nil {

@@ -14,7 +14,8 @@ type getFeedsRequest struct {
 	UserID string `json:"user_id"`
 }
 type getFeedsResponse struct {
-	Err error `json:"err,omitempty"`
+	Feed []Feed `json:"feed,omitempty"`
+	Err  error  `json:"err,omitempty"`
 }
 
 type getUserPostsRequest struct {

@@ -11,6 +11,7 @@ import (
 
 	"github.com/FotiadisM/workflow-server/internal/auth"
 	"github.com/FotiadisM/workflow-server/internal/conversations"
+	"github.com/FotiadisM/workflow-server/internal/feed"
 	"github.com/FotiadisM/workflow-server/internal/jobs"
 	"github.com/FotiadisM/workflow-server/internal/posts"
 	"github.com/FotiadisM/workflow-server/internal/repository"
@@ -74,6 +75,8 @@ func main() {
 		httptransport.ServerErrorEncoder(httptransport.DefaultErrorEncoder),
 	}
 
+	chFeed := make(chan feed.ChannelFeed)
+
 	var clients = make(map[*websocket.Conn]Session)
 	var broadcast = make(chan conversations.BroadCastMessage)
 	r := mux.NewRouter()
@@ -87,7 +90,7 @@ func main() {
 		userEnds := user.NewEndpoints(userSvc)
 		user.NewHTTPHandler(userEnds, r.PathPrefix("/users").Subrouter(), options...)
 
-		postsSvc := posts.NewService(repo)
+		postsSvc := posts.NewService(repo, chFeed)
 		postsEnds := posts.NewEndpoints(postsSvc)
 		posts.NewHTTPRouter(postsEnds, r.PathPrefix("/posts").Subrouter(), options...)
 
@@ -133,6 +136,9 @@ func main() {
 			}
 		})
 	}
+
+	feedSvc := feed.NewService(repo)
+	go feedSvc.Run(ctx, chFeed)
 
 	co := handlers.AllowedOrigins([]string{"http://localhost:3000", "*"})
 	ch := handlers.AllowedHeaders([]string{"Content-Type", "*"})

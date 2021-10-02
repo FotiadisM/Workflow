@@ -2,6 +2,8 @@ package posts
 
 import (
 	"context"
+
+	"github.com/FotiadisM/workflow-server/internal/feed"
 )
 
 type Service interface {
@@ -19,10 +21,11 @@ type Service interface {
 
 type service struct {
 	repo Repository
+	ch   chan feed.ChannelFeed
 }
 
-func NewService(r Repository) Service {
-	return service{repo: r}
+func NewService(r Repository, ch chan feed.ChannelFeed) Service {
+	return service{repo: r, ch: ch}
 }
 
 func (s service) getPost(ctx context.Context, req getPostsRequest) (res getPostsResponse, err error) {
@@ -37,6 +40,11 @@ func (s service) getPost(ctx context.Context, req getPostsRequest) (res getPosts
 }
 
 func (s service) getFeed(ctx context.Context, req getFeedsRequest) (res getFeedsResponse, err error) {
+	res.Feed, err = s.repo.GetFeed(ctx, req.UserID)
+	if err != nil {
+		res.Err = err
+	}
+
 	return
 }
 
@@ -85,6 +93,11 @@ func (s service) CreatePost(ctx context.Context, req CreatePostRequest) (res Cre
 		Created:  t.Format("1/2 15:04"),
 	}
 
+	s.ch <- feed.ChannelFeed{
+		PostID:        id,
+		PerpetratorID: req.UserID,
+		Type:          "posts",
+	}
 	return
 }
 
@@ -114,6 +127,13 @@ func (s service) createPostComment(ctx context.Context, req createPostCommentReq
 		Likes:   []string{req.UserID},
 		Created: t.Format("1/2 15:04"),
 	}
+
+	s.ch <- feed.ChannelFeed{
+		PostID:        req.PostID,
+		PerpetratorID: req.UserID,
+		Type:          "comment",
+	}
+
 	return res, nil
 }
 
@@ -121,6 +141,12 @@ func (s service) TogglePostLike(ctx context.Context, req TogglePostLikeRequest) 
 	err = s.repo.TogglePostLike(ctx, req.PostID, req.UserID)
 	if err != nil {
 		res.Err = err
+	}
+
+	s.ch <- feed.ChannelFeed{
+		PostID:        req.PostID,
+		PerpetratorID: req.UserID,
+		Type:          "like",
 	}
 
 	return

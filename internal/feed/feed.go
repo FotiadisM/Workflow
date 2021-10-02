@@ -20,7 +20,7 @@ type Repository interface {
 }
 
 type Service interface {
-	Run(ctx context.Context, ch chan ChannelFeed) (err error)
+	Run(ctx context.Context, ch chan ChannelFeed)
 }
 
 type service struct {
@@ -31,22 +31,29 @@ func NewService(r Repository) Service {
 	return service{r}
 }
 
-func (s service) Run(ctx context.Context, ch chan ChannelFeed) (err error) {
-	f := <-ch
+func (s service) Run(ctx context.Context, ch chan ChannelFeed) {
+	for {
+		f := <-ch
 
-	cons, err := s.r.GetConnections(ctx, f.PerpetratorID)
-	if err != nil {
-		return
-	}
-
-	for i, j := range cons {
-		fmt.Println(i, j)
-		_, err = s.r.UpdateUserFeed(ctx, j.UserID, f.PerpetratorID, f.PostID, f.Type)
+		_, err := s.r.UpdateUserFeed(ctx, f.PerpetratorID, f.PerpetratorID, f.PostID, f.Type)
 		if err != nil {
+			fmt.Println("Failed to update user feed", err)
 			return
 		}
-	}
 
-	fmt.Sprintln(f)
-	return
+		cons, err := s.r.GetConnections(ctx, f.PerpetratorID)
+		if err != nil {
+			fmt.Println("Failed to get connections", err)
+			return
+		}
+
+		for i, j := range cons {
+			fmt.Println(i, j)
+			_, err = s.r.UpdateUserFeed(ctx, j.UserID, f.PerpetratorID, f.PostID, f.Type)
+			if err != nil {
+				fmt.Println("Failed to update user feed", err)
+				return
+			}
+		}
+	}
 }
