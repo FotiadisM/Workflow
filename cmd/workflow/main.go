@@ -153,7 +153,7 @@ func main() {
 
 	go func() {
 		logger.Log("listening", httpPort)
-		errc <- httpServer.ListenAndServe()
+		errc <- httpServer.ListenAndServeTLS("server.crt", "server.key")
 	}()
 
 	go func() {

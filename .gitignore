@@ -1,6 +1,9 @@
 workflow
 cockroach-data
 
+server.key
+server.crt
+
 test
 app_files
 mock-data

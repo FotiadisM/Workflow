@@ -47,5 +47,27 @@ func (r Repository) GetFeed(ctx context.Context, userID string) (fs []posts.Feed
 		fs = append(fs, f)
 	}
 
+	rows, err = r.db.Query(ctx, `
+	SELECT
+		id, user_id
+	FROM
+		posts
+	ORDER BY
+		RANDOM()
+	LIMIT
+		200
+	`)
+	defer rows.Close()
+	for rows.Next() {
+		f := posts.Feed{}
+		err = rows.Scan(&f.PostID, &f.PerpetratorID)
+		if err != nil {
+			return
+		}
+		f.ID = f.PostID
+		f.FeedType = "post"
+		fs = append(fs, f)
+	}
+
 	return
 }
